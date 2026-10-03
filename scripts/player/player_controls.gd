@@ -60,6 +60,12 @@ func read_device(owner: Node2D, delta: float) -> void:
 	push_held = Input.is_action_pressed("push")
 	pull_pressed = Input.is_action_just_pressed("pull")
 	pull_held = Input.is_action_pressed("pull")
+	# Clicks on a debug or menu panel are not Pushes.
+	if owner.get_viewport().gui_get_hovered_control() != null:
+		push_pressed = false
+		push_held = false
+		pull_pressed = false
+		pull_held = false
 	flare_held = Input.is_action_pressed("flare")
 	flare_pressed = Input.is_action_just_pressed("flare")
 	coin_pressed = Input.is_action_just_pressed("coin")

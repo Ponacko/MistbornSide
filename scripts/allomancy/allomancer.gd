@@ -22,6 +22,9 @@ var force_dir := Vector2.ZERO
 var cycle_candidates: Array[MetalSource] = []
 
 var _cycle_id: Variant = null
+## After a forced release (jumping off a bracket), a still-held button does
+## nothing until it is let go and pressed again.
+var _ignore_held := false
 var _candidates := []
 var _prev_positions := {}
 var _cur_positions := {}
@@ -113,6 +116,10 @@ func _apply_force(delta: float) -> void:
 	force_active = false
 	var c := vin.controls
 	var t := Game.tuning
+	if _ignore_held:
+		if c.push_held or c.pull_held:
+			return
+		_ignore_held = false
 	if c.push_pressed:
 		mode = Mode.PUSH
 		locked = null
@@ -158,14 +165,42 @@ func _apply_force(delta: float) -> void:
 	# A Push drives the target away from Vin and Vin away from it; a Pull the reverse.
 	var vin_dir := -dir if mode == Mode.PUSH else dir
 	var delivered := PushPhysics.deliver(locked, -vin_dir * impulse, t.vin_mass, t)
-	vin.velocity += vin_dir * delivered.length() / t.vin_mass
+	var dv := vin_dir * delivered.length() / t.vin_mass
+	var hovering := mode == Mode.PUSH and rad_to_deg(vin_dir.angle_to(Vector2.UP)) < t.hover_cone_degrees and rad_to_deg(vin_dir.angle_to(Vector2.UP)) > -t.hover_cone_degrees
+	if hovering:
+		dv.x *= t.hover_lateral_mult
+		vin.velocity.x = ForceModel.hover_damp(t, vin.velocity.x, delta) if c.move.x == 0.0 else vin.velocity.x
+	vin.velocity += dv
+	if mode == Mode.PULL and locked.kind == MetalSource.Kind.ANCHORED:
+		var along := vin.velocity.project(dir)
+		var across := vin.velocity - along
+		vin.velocity = along + across * maxf(1.0 - t.pull_line_damping * delta, 0.0)
 	if absf(vin_dir.y) > 0.8:
 		vin.velocity.y = ForceModel.hover_damp(t, vin.velocity.y, delta)
 	vin.reserves.burn(metal, delta, c.flare_held)
 	force_active = true
 	force_dir = vin_dir
-	if mode == Mode.PULL and locked.kind == MetalSource.Kind.ANCHORED and d < t.bracket_catch_distance:
-		vin.cling_to(locked)
+	if mode == Mode.PULL and locked.kind == MetalSource.Kind.ANCHORED:
+		# Swept catch: also cling if this frame's flight passes close by.
+		var step_end := _cur_chest + vin.velocity * delta
+		var closest := Geometry2D.get_closest_point_to_segment(locked.global_position, _cur_chest, step_end)
+		if minf(d, closest.distance_to(locked.global_position)) < t.bracket_catch_distance:
+			vin.cling_to(locked)
+
+
+## True while a Pull on an anchor is carrying Vin (gravity is lightened).
+func pulling_anchor() -> bool:
+	return force_active and mode == Mode.PULL and _valid(locked) and locked.kind == MetalSource.Kind.ANCHORED
+
+
+## Ends the current Push or Pull; it will not resume until the button is
+## pressed again.
+func release() -> void:
+	mode = Mode.NONE
+	locked = null
+	steelsight.cancel()
+	_ignore_held = true
+	TimeController.set_factor(&"steelsight", 1.0)
 
 
 ## The faint half-second arc drawn during Steelsight and its ramp.

@@ -48,10 +48,21 @@ func jump_speed() -> float:
 ## or Pull acts on her. Makes a held Push over an anchor settle into a hover;
 ## sideways launches are untouched, so momentum is kept.
 @export var hover_damping := 4.0
+## A Push within this angle of straight down is a hover: its sideways part is
+## scaled down and sideways speed damped, so balancing over an anchor is
+## stable and steered with the move keys instead of flinging Vin off it.
+@export var hover_cone_degrees := 30.0
+@export var hover_lateral_mult := 0.3
 ## Fastest a Push can make a light dynamic source (a coin) travel.
 @export var projectile_max_speed := 900.0
 ## Pulling to an anchor closer than this makes Vin cling to it.
-@export var bracket_catch_distance := 14.0
+@export var bracket_catch_distance := 20.0
+## Gravity multiplier while Pulling on an anchor, so Vin flies a near-straight
+## line to it instead of sagging under it.
+@export var pull_gravity_mult := 0.4
+## Damping (per second) of Vin's motion across the line while she Pulls on
+## an anchor: a Pull to fixed metal flies like a zip line, not a pendulum.
+@export var pull_line_damping := 6.0
 
 @export_group("Steelsight and forgiveness")
 @export var steelsight_time_scale := 0.15
@@ -83,7 +94,7 @@ func jump_speed() -> float:
 @export var light_hit_stagger := 0.35
 @export var heavy_hit_stagger := 0.6
 ## How far Vin sees in the mists without tin; tin triples it.
-@export var vision_radius := 170.0
+@export var vision_radius := 260.0
 @export var tin_flash_stun := 1.0
 @export var tin_pulse_time := 0.6
 

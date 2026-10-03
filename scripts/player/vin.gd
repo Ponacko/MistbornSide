@@ -207,6 +207,22 @@ func _crash(t: Tuning) -> void:
 	crashed.emit()
 
 
+## Puts Vin back on her feet at a checkpoint: still, calm, whole.
+func respawn_at(at: Vector2) -> void:
+	global_position = at
+	velocity = Vector2.ZERO
+	state = State.NORMAL
+	_stagger_left = 0.0
+	_stunned = false
+	crash_time_left = 0.0
+	crouching = false
+	_apply_shape()
+	allomancy.steelsight.cancel()
+	health.reset()
+	reset_physics_interpolation()
+	cloak.reset(global_position + SHOULDERS)
+
+
 ## A blow lands on Vin. Pewter halves damage (quarters flared) and shrugs off
 ## light hits without staggering.
 func take_hit(hit: Hit) -> bool:
@@ -286,7 +302,10 @@ func _normal(delta: float, t: Tuning) -> void:
 	velocity.x = MovementMath.horizontal(t, velocity.x, input_x, on_floor and not forced, delta, top)
 
 	if forced:
-		velocity.y += ForceModel.push_gravity(t, velocity.y) * delta
+		var g := ForceModel.push_gravity(t, velocity.y)
+		if allomancy.pulling_anchor():
+			g *= t.pull_gravity_mult
+		velocity.y += g * delta
 		# Jump cancels downward speed mid-Push (DESIGN.md 5.4).
 		if controls.jump_pressed and not on_floor and velocity.y > 0.0:
 			velocity.y = 0.0
@@ -450,8 +469,12 @@ func _bracket_hang() -> void:
 		state = State.NORMAL
 		return
 	global_position = _cling_source.global_position - CHEST
-	if controls.jump_pressed:
+	if allomancy.locked != null and allomancy.locked != _cling_source:
+		# Retargeted while hanging: let the new Push or Pull carry her.
 		state = State.NORMAL
+	elif controls.jump_pressed:
+		state = State.NORMAL
+		allomancy.release()
 		_jump(Game.tuning)
 	elif not controls.pull_held:
 		state = State.NORMAL

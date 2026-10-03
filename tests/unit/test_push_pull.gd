@@ -130,3 +130,13 @@ func test_vial_pickup_refills_reserves() -> void:
 	await physics_frames(30)
 	assert_near(w.vin.reserves.amount(MetalReserves.Metal.STEEL), MetalReserves.FULL, 0.5, "refilled")
 	assert_false(is_instance_valid(vial) and vial.is_inside_tree(), "vial consumed")
+
+
+func test_hover_off_centre_stays_over_the_anchor() -> void:
+	var w := TestWorld.create(self, [FLOOR], Vector2(4, -1))
+	var anchor := w.anchor(Vector2(0, -1), 300.0)
+	await physics_frames(2)
+	_hold_push(w, anchor)
+	await physics_frames(300)
+	assert_lt(absf(w.vin.global_position.x), 40.0, "not flung sideways")
+	assert_lt(absf(w.vin.velocity.x), 10.0, "settled")

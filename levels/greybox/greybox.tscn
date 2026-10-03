@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
@@ -17,201 +17,435 @@
 [ext_resource type="Script" path="res://scripts/level/noise_emitter.gd" id="15"]
 [ext_resource type="Script" path="res://scripts/combat/hazard.gd" id="16"]
 [ext_resource type="Script" path="res://scripts/level/weak_board.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/level/checkpoint.gd" id="18"]
+[ext_resource type="Script" path="res://scripts/level/kill_zone.gd" id="19"]
+[ext_resource type="Script" path="res://scripts/level/course_goal.gd" id="20"]
+[ext_resource type="Script" path="res://scripts/ui/tuning_panel.gd" id="21"]
 
 [node name="Greybox" type="Node2D"]
 
-[node name="Backdrop" type="Node2D" parent="."]
-position = Vector2(-320, -420)
+[node name="YardBackdrop" type="Node2D" parent="."]
 script = ExtResource("13")
-size = Vector2(1640, 420)
+position = Vector2(-1820, -420)
+size = Vector2(1820, 420)
 color = Color(0.16, 0.16, 0.19, 1)
 
-[node name="HutBack" type="Node2D" parent="."]
-position = Vector2(-250, -62)
+[node name="CityBackdrop" type="Node2D" parent="."]
 script = ExtResource("13")
+position = Vector2(0, -1000)
+size = Vector2(3000, 1060)
+color = Color(0.13, 0.13, 0.16, 1)
+
+[node name="HutBack" type="Node2D" parent="."]
+script = ExtResource("13")
+position = Vector2(-1750, -62)
 size = Vector2(140, 62)
 color = Color(0.3, 0.24, 0.2, 1)
 
 [node name="Geometry" type="Node2D" parent="."]
 
 [node name="Ground" type="StaticBody2D" parent="Geometry"]
-position = Vector2(-320, 0)
 script = ExtResource("1")
-size = Vector2(1400, 64)
+position = Vector2(-1820, 0)
+size = Vector2(1820, 64)
 
 [node name="Step1" type="StaticBody2D" parent="Geometry"]
-position = Vector2(120, -16)
 script = ExtResource("1")
+position = Vector2(-1380, -16)
 size = Vector2(64, 16)
 
 [node name="Step2" type="StaticBody2D" parent="Geometry"]
-position = Vector2(184, -32)
 script = ExtResource("1")
+position = Vector2(-1316, -32)
 size = Vector2(64, 32)
 
 [node name="LedgeWall" type="StaticBody2D" parent="Geometry"]
-position = Vector2(300, -72)
 script = ExtResource("1")
+position = Vector2(-1200, -72)
 size = Vector2(96, 72)
 
 [node name="ClimbWall" type="StaticBody2D" parent="Geometry"]
-position = Vector2(520, -260)
 script = ExtResource("1")
+position = Vector2(-980, -260)
 size = Vector2(24, 260)
 
 [node name="ClimbWallB" type="StaticBody2D" parent="Geometry"]
-position = Vector2(600, -200)
 script = ExtResource("1")
+position = Vector2(-900, -200)
 size = Vector2(24, 160)
 
 [node name="Crawl" type="StaticBody2D" parent="Geometry"]
-position = Vector2(700, -34)
 script = ExtResource("1")
+position = Vector2(-800, -34)
 size = Vector2(140, 12)
 
 [node name="RoofA" type="StaticBody2D" parent="Geometry"]
-position = Vector2(900, -64)
 script = ExtResource("1")
+position = Vector2(-600, -64)
 size = Vector2(120, 64)
 
 [node name="RoofB" type="StaticBody2D" parent="Geometry"]
-position = Vector2(1080, -64)
 script = ExtResource("1")
+position = Vector2(-420, -64)
 size = Vector2(120, 64)
 
 [node name="LeftWall" type="StaticBody2D" parent="Geometry"]
-position = Vector2(-320, -400)
 script = ExtResource("1")
+position = Vector2(-1820, -400)
 size = Vector2(32, 400)
 
 [node name="HutRoof" type="StaticBody2D" parent="Geometry"]
-position = Vector2(-260, -72)
 script = ExtResource("1")
+position = Vector2(-1760, -72)
 size = Vector2(150, 10)
 
 [node name="HutWall" type="StaticBody2D" parent="Geometry"]
-position = Vector2(-260, -62)
 script = ExtResource("1")
+position = Vector2(-1760, -62)
 size = Vector2(10, 40)
+
+[node name="R0_Start" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(0, -160)
+size = Vector2(320, 240)
+color = Color(0.3, 0.31, 0.35, 1)
+
+[node name="R1_Bracket" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(320, -320)
+size = Vector2(240, 400)
+color = Color(0.3, 0.31, 0.35, 1)
+
+[node name="R2_Gate" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(900, -300)
+size = Vector2(240, 380)
+color = Color(0.3, 0.31, 0.35, 1)
+
+[node name="R3_Grate" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1420, -300)
+size = Vector2(280, 380)
+color = Color(0.3, 0.31, 0.35, 1)
+
+[node name="R4_Climb" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1700, -620)
+size = Vector2(200, 700)
+color = Color(0.3, 0.31, 0.35, 1)
+
+[node name="R5_Step" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1900, -740)
+size = Vector2(250, 820)
+color = Color(0.3, 0.31, 0.35, 1)
+
+[node name="R6_CityWall" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2500, -760)
+size = Vector2(400, 840)
+color = Color(0.3, 0.31, 0.35, 1)
+
+[node name="SpirePillar" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2316, -560)
+size = Vector2(8, 640)
+color = Color(0.25, 0.26, 0.3, 1)
+
+[node name="EndWall" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2900, -1000)
+size = Vector2(40, 1080)
 
 [node name="Metal" type="Node2D" parent="."]
 
 [node name="Bracket1" type="Node2D" parent="Metal"]
-position = Vector2(360, -140)
 script = ExtResource("5")
+position = Vector2(-1140, -140)
 style = 1
 
 [node name="LampPost1" type="Node2D" parent="Metal"]
-position = Vector2(230, -80)
 script = ExtResource("5")
+position = Vector2(-1270, -80)
 style = 2
 
 [node name="Gate1" type="Node2D" parent="Metal"]
-position = Vector2(820, -40)
 script = ExtResource("5")
+position = Vector2(-680, -40)
 style = 3
 
 [node name="Nail1" type="Node2D" parent="Metal"]
-position = Vector2(-120, -60)
 script = ExtResource("5")
+position = Vector2(-1620, -60)
 style = 0
 
 [node name="Plate1" type="Node2D" parent="Metal"]
-position = Vector2(560, -280)
 script = ExtResource("5")
+position = Vector2(-940, -280)
 style = 4
 
 [node name="Hinge1" type="Node2D" parent="Metal"]
-position = Vector2(600, -120)
 script = ExtResource("5")
+position = Vector2(-900, -120)
 style = 5
 
 [node name="Bracket2" type="Node2D" parent="Metal"]
-position = Vector2(1000, -180)
 script = ExtResource("5")
+position = Vector2(-500, -180)
 style = 1
 
 [node name="LampPost2" type="Node2D" parent="Metal"]
-position = Vector2(1150, -150)
 script = ExtResource("5")
+position = Vector2(-350, -150)
 style = 2
+
+[node name="P1_HighBracket" type="Node2D" parent="Metal"]
+script = ExtResource("5")
+position = Vector2(308, -330)
+style = 1
+
+[node name="P2_StreetLamp" type="Node2D" parent="Metal"]
+script = ExtResource("5")
+position = Vector2(730, -380)
+style = 1
+
+[node name="P2_FarBracket" type="Node2D" parent="Metal"]
+script = ExtResource("5")
+position = Vector2(892, -330)
+style = 1
+
+[node name="P3_Gate" type="Node2D" parent="Metal"]
+script = ExtResource("5")
+position = Vector2(940, -324)
+style = 3
+
+[node name="P4_Grate" type="Node2D" parent="Metal"]
+script = ExtResource("5")
+position = Vector2(1650, -302)
+style = 4
+
+[node name="P4_WallPlate" type="Node2D" parent="Metal"]
+script = ExtResource("5")
+position = Vector2(1690, -470)
+style = 4
+
+[node name="P6_Spire" type="Node2D" parent="Metal"]
+script = ExtResource("5")
+position = Vector2(2320, -560)
+style = 6
 
 [node name="Night" type="Node2D" parent="."]
 script = ExtResource("9")
 
 [node name="HutInterior" type="Node2D" parent="."]
-position = Vector2(-250, -62)
 script = ExtResource("11")
+position = Vector2(-1750, -62)
 size = Vector2(140, 62)
 
 [node name="Lantern1" type="Node2D" parent="."]
-position = Vector2(-60, -90)
 script = ExtResource("10")
+position = Vector2(-1560, -90)
 
 [node name="Lantern2" type="Node2D" parent="."]
-position = Vector2(860, -110)
 script = ExtResource("10")
+position = Vector2(-640, -110)
 
 [node name="HutLantern" type="Node2D" parent="."]
-position = Vector2(-180, -50)
 script = ExtResource("10")
+position = Vector2(-1680, -50)
 radius = 70.0
 metal = false
 
+[node name="Lamplighter" type="Node2D" parent="."]
+script = ExtResource("10")
+position = Vector2(-840, -40)
+flash_interval = 3.0
+metal = false
+
+[node name="CourseLight0" type="Node2D" parent="."]
+script = ExtResource("10")
+position = Vector2(200, -200)
+metal = false
+
+[node name="CourseLight1" type="Node2D" parent="."]
+script = ExtResource("10")
+position = Vector2(730, -392)
+metal = false
+
+[node name="CourseLight2" type="Node2D" parent="."]
+script = ExtResource("10")
+position = Vector2(1300, -360)
+metal = false
+
+[node name="CourseLight3" type="Node2D" parent="."]
+script = ExtResource("10")
+position = Vector2(1660, -560)
+metal = false
+
+[node name="CourseLight4" type="Node2D" parent="."]
+script = ExtResource("10")
+position = Vector2(2050, -800)
+metal = false
+
+[node name="CourseLight5" type="Node2D" parent="."]
+script = ExtResource("10")
+position = Vector2(2700, -820)
+metal = false
+
 [node name="SpikedStatue" type="StaticBody2D" parent="."]
-position = Vector2(1250, 0)
 script = ExtResource("8")
+position = Vector2(-250, 0)
 
 [node name="Repeller" type="Node2D" parent="SpikedStatue"]
-position = Vector2(0, -30)
 script = ExtResource("12")
-
-[node name="Vin" parent="." instance=ExtResource("2")]
-position = Vector2(0, -1)
-
-[node name="Camera" type="Camera2D" parent="."]
-process_callback = 0
-script = ExtResource("3")
-target_path = NodePath("../Vin")
+position = Vector2(0, -30)
 
 [node name="Dummy1" type="StaticBody2D" parent="."]
-position = Vector2(460, 0)
 script = ExtResource("8")
+position = Vector2(-1040, 0)
 
 [node name="Dummy2" type="StaticBody2D" parent="."]
-position = Vector2(1140, -64)
 script = ExtResource("8")
+position = Vector2(-360, -64)
 
 [node name="HiddenPatrol" type="Node2D" parent="."]
-position = Vector2(-210, -10)
 script = ExtResource("15")
+position = Vector2(-1710, -10)
 walk_distance = 40.0
 
 [node name="Whisper" type="Node2D" parent="."]
-position = Vector2(-150, -30)
 script = ExtResource("15")
+position = Vector2(-1650, -30)
 kind = 1
 loudness = 0.4
 interval = 2.0
 
-[node name="Lamplighter" type="Node2D" parent="."]
-position = Vector2(660, -40)
-script = ExtResource("10")
-flash_interval = 3.0
-metal = false
-
 [node name="Embers" type="Area2D" parent="."]
-position = Vector2(80, -6)
 script = ExtResource("16")
+position = Vector2(-1420, -6)
 
 [node name="Board" type="StaticBody2D" parent="."]
-position = Vector2(-120, -62)
 script = ExtResource("17")
+position = Vector2(-1620, -62)
 size = Vector2(8, 62)
 
 [node name="Vial1" type="Area2D" parent="."]
-position = Vector2(940, -80)
 script = ExtResource("7")
+position = Vector2(-560, -80)
+
+[node name="Vial2" type="Area2D" parent="."]
+script = ExtResource("7")
+position = Vector2(1500, -312)
+
+[node name="Vial3" type="Area2D" parent="."]
+script = ExtResource("7")
+position = Vector2(2000, -752)
+
+[node name="Street" type="Area2D" parent="."]
+script = ExtResource("19")
+position = Vector2(0, 40)
+size = Vector2(2900, 80)
+
+[node name="Checkpoint0" type="Area2D" parent="."]
+script = ExtResource("18")
+position = Vector2(60, -160)
+
+[node name="Checkpoint1" type="Area2D" parent="."]
+script = ExtResource("18")
+position = Vector2(400, -320)
+
+[node name="Checkpoint2" type="Area2D" parent="."]
+script = ExtResource("18")
+position = Vector2(1090, -300)
+
+[node name="Checkpoint3" type="Area2D" parent="."]
+script = ExtResource("18")
+position = Vector2(1460, -300)
+
+[node name="Checkpoint4" type="Area2D" parent="."]
+script = ExtResource("18")
+position = Vector2(1740, -620)
+
+[node name="Checkpoint5" type="Area2D" parent="."]
+script = ExtResource("18")
+position = Vector2(1940, -740)
+
+[node name="Goal" type="Area2D" parent="."]
+script = ExtResource("20")
+position = Vector2(2800, -760)
+
+[node name="Hints" type="Node2D" parent="."]
+
+[node name="Hint1" type="Label" parent="Hints"]
+offset_left = 120.0
+offset_top = -250.0
+offset_right = 420.0
+offset_bottom = -238.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 0.85)
+text = "1  Ironpull (hold RMB) to the bracket, then jump"
+
+[node name="Hint2" type="Label" parent="Hints"]
+offset_left = 600.0
+offset_top = -430.0
+offset_right = 900.0
+offset_bottom = -418.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 0.85)
+text = "2  Pull to the street lamp; retarget to the far bracket"
+
+[node name="Hint3" type="Label" parent="Hints"]
+offset_left = 960.0
+offset_top = -400.0
+offset_right = 1260.0
+offset_bottom = -388.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 0.85)
+text = "3  Push (hold LMB) off the gate behind you to clear the gap"
+
+[node name="Hint4" type="Label" parent="Hints"]
+offset_left = 1450.0
+offset_top = -420.0
+offset_right = 1750.0
+offset_bottom = -408.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 0.85)
+text = "4  Push off the grate, then the wall plate, to climb"
+
+[node name="Hint5" type="Label" parent="Hints"]
+offset_left = 1720.0
+offset_top = -700.0
+offset_right = 2020.0
+offset_bottom = -688.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 0.85)
+text = "5  Drop a coin (S+E), stand over it and Push"
+
+[node name="Hint6" type="Label" parent="Hints"]
+offset_left = 1960.0
+offset_top = -820.0
+offset_right = 2260.0
+offset_bottom = -808.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 0.85)
+text = "6  Run and jump; Push off the spire below as you fall"
+
+[node name="YardHint" type="Label" parent="Hints"]
+offset_left = -700.0
+offset_top = -300.0
+offset_right = -400.0
+offset_bottom = -288.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 0.85)
+text = "The yard: a sandbox for every system"
+
+[node name="Vin" parent="." instance=ExtResource("2")]
+position = Vector2(60, -161)
+
+[node name="Camera" type="Camera2D" parent="."]
+script = ExtResource("3")
+process_callback = 0
+target_path = NodePath("../Vin")
 
 [node name="Hud" type="CanvasLayer" parent="."]
 script = ExtResource("6")
@@ -219,11 +453,14 @@ script = ExtResource("6")
 [node name="ScreenFx" type="CanvasLayer" parent="."]
 script = ExtResource("14")
 
+[node name="TuningPanel" type="CanvasLayer" parent="."]
+script = ExtResource("21")
+
 [node name="Debug" type="CanvasLayer" parent="."]
 layer = 100
 
 [node name="Fps" type="Label" parent="Debug"]
+script = ExtResource("4")
 offset_left = 4.0
 offset_top = 2.0
 theme_override_font_sizes/font_size = 8
-script = ExtResource("4")

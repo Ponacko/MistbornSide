@@ -46,6 +46,9 @@ func _draw_hud() -> void:
 	x += 6.0
 	_canvas.draw_rect(Rect2(x, ORIGIN.y + VIAL_SIZE.y - 5, 5, 4), Color(0.8, 0.55, 0.35))
 	_canvas.draw_string(ThemeDB.fallback_font, Vector2(x + 8, ORIGIN.y + VIAL_SIZE.y), str(vin.pouch.count), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.85, 0.85, 0.9, 0.85))
+	if CourseClock.started:
+		var text := "%d:%05.2f" % [int(CourseClock.elapsed) / 60, fmod(CourseClock.elapsed, 60.0)]
+		_canvas.draw_string(ThemeDB.fallback_font, Vector2(560, 14), text, HORIZONTAL_ALIGNMENT_RIGHT, 72, 8, Color(0.9, 0.9, 0.95, 0.9 if CourseClock.running else 0.5))
 
 
 func _vial(at: Vector2, fill: float, color: Color) -> void:

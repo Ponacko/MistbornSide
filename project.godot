@@ -24,6 +24,8 @@ TimeController="*res://scripts/core/time_controller.gd"
 MistField="*res://scripts/fx/mist_field.gd"
 NoiseBus="*res://scripts/core/noise_bus.gd"
 Settings="*res://scripts/core/settings.gd"
+Checkpoints="*res://scripts/level/checkpoints.gd"
+CourseClock="*res://scripts/level/course_clock.gd"
 
 [display]
 

@@ -76,7 +76,7 @@ void fragment() {
 	vec3 col = mix(mist_color.rgb, steel_color.rgb, blue_tint);
 	float alpha = clamp(density, 0.0, 0.62);
 	float outside = smoothstep(vision_radius * 0.55, vision_radius, distance(world, vision_center));
-	col = mix(col, vec3(0.025, 0.03, 0.045), outside * 0.8);
-	alpha = max(alpha, outside * 0.6);
+	col = mix(col, vec3(0.025, 0.03, 0.045), outside * 0.7);
+	alpha = max(alpha, outside * 0.45);
 	COLOR = vec4(col, alpha);
 }
