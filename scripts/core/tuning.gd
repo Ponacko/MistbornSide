@@ -33,3 +33,13 @@ func jump_gravity() -> float:
 
 func jump_speed() -> float:
 	return JumpMath.launch_speed_for(jump_height_tiles * TILE, jump_time_to_apex)
+
+@export_group("Lines and targeting")
+## Range of the blue lines and of Push and Pull, in pixels (about a screen).
+@export var line_range := 420.0
+## How close to the cursor a source must be to be picked by aim.
+@export var aim_snap_radius := 48.0
+## Cursor distance forgiven per tenfold of mass over a clip.
+@export var aim_mass_weight := 4.0
+## Steepest angle from straight down that the falling heuristic accepts.
+@export var below_cone_degrees := 50.0

@@ -19,6 +19,7 @@ const LEDGE_HAND_Y := -40.0
 @export var scripted := false
 
 var controls := PlayerControls.new()
+var allomancy: Allomancer
 var state := State.NORMAL
 var facing := 1
 var crouching := false
@@ -49,6 +50,16 @@ func _ready() -> void:
 	add_child(_shape)
 	_forgiveness = JumpForgiveness.new(Game.tuning.coyote_time, Game.tuning.jump_buffer)
 	add_to_group("player")
+	allomancy = Allomancer.new(self)
+	add_child(allomancy)
+	var layer := CanvasLayer.new()
+	layer.name = "LinesLayer"
+	layer.layer = CanvasLayers.LINES
+	layer.follow_viewport_enabled = true
+	var lines_node := BlueLines.new()
+	lines_node.allomancer = allomancy
+	layer.add_child(lines_node)
+	add_child(layer)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -70,6 +81,7 @@ func _physics_process(delta: float) -> void:
 			_normal(delta, t)
 		State.LEDGE_HANG:
 			_ledge_hang()
+	allomancy.physics_update(delta)
 	if scripted:
 		controls.end_frame()
 

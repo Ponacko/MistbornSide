@@ -24,3 +24,15 @@ func block(r: Rect2) -> Block:
 	b.size = r.size
 	add_child(b)
 	return b
+
+
+## An anchored metal source fixed at a point (a bracket or nail).
+func anchor(pos: Vector2, mass := 5.0) -> MetalSource:
+	var holder := Node2D.new()
+	holder.position = pos
+	var s := MetalSource.new()
+	s.mass = mass
+	s.kind = MetalSource.Kind.ANCHORED
+	holder.add_child(s)
+	add_child(holder)
+	return s
