@@ -1,0 +1,77 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/core/game_camera.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/ui/fps_label.gd" id="4"]
+
+[node name="Greybox" type="Node2D"]
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(-320, 0)
+script = ExtResource("1")
+size = Vector2(1400, 64)
+
+[node name="Step1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(120, -16)
+script = ExtResource("1")
+size = Vector2(64, 16)
+
+[node name="Step2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(184, -32)
+script = ExtResource("1")
+size = Vector2(64, 32)
+
+[node name="LedgeWall" type="StaticBody2D" parent="Geometry"]
+position = Vector2(300, -72)
+script = ExtResource("1")
+size = Vector2(96, 72)
+
+[node name="ClimbWall" type="StaticBody2D" parent="Geometry"]
+position = Vector2(520, -260)
+script = ExtResource("1")
+size = Vector2(24, 260)
+
+[node name="ClimbWallB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(600, -200)
+script = ExtResource("1")
+size = Vector2(24, 160)
+
+[node name="Crawl" type="StaticBody2D" parent="Geometry"]
+position = Vector2(700, -34)
+script = ExtResource("1")
+size = Vector2(140, 12)
+
+[node name="RoofA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(900, -64)
+script = ExtResource("1")
+size = Vector2(120, 64)
+
+[node name="RoofB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1080, -64)
+script = ExtResource("1")
+size = Vector2(120, 64)
+
+[node name="LeftWall" type="StaticBody2D" parent="Geometry"]
+position = Vector2(-320, -400)
+script = ExtResource("1")
+size = Vector2(32, 400)
+
+[node name="Vin" parent="." instance=ExtResource("2")]
+position = Vector2(0, -1)
+
+[node name="Camera" type="Camera2D" parent="."]
+process_callback = 0
+script = ExtResource("3")
+target_path = NodePath("../Vin")
+
+[node name="Debug" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="Fps" type="Label" parent="Debug"]
+offset_left = 4.0
+offset_top = 2.0
+theme_override_font_sizes/font_size = 8
+script = ExtResource("4")
