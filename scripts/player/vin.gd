@@ -6,7 +6,7 @@ extends CharacterBody2D
 signal landed(fall_speed: float)
 signal jumped
 
-enum State { NORMAL, LEDGE_HANG }
+enum State { NORMAL, LEDGE_HANG, BRACKET_HANG }
 
 const HALF_WIDTH := 6.0
 const STAND_HEIGHT := 44.0
@@ -19,7 +19,11 @@ const LEDGE_HAND_Y := -40.0
 @export var scripted := false
 
 var controls := PlayerControls.new()
+var reserves := MetalReserves.new()
 var allomancy: Allomancer
+var body_mass: float:
+	get:
+		return Game.tuning.vin_mass
 var state := State.NORMAL
 var facing := 1
 var crouching := false
@@ -36,6 +40,7 @@ var _wall_jump_lock := 0.0
 var _was_on_floor := false
 var _jump_held_since_jump := false
 var _ledge_point := Vector2.ZERO
+var _cling_source: MetalSource
 
 
 func _ready() -> void:
@@ -76,12 +81,14 @@ func _physics_process(delta: float) -> void:
 	_ledge_cooldown = maxf(_ledge_cooldown - delta, 0.0)
 	_wall_jump_lock = maxf(_wall_jump_lock - delta, 0.0)
 
+	allomancy.physics_update(delta)
 	match state:
 		State.NORMAL:
 			_normal(delta, t)
 		State.LEDGE_HANG:
 			_ledge_hang()
-	allomancy.physics_update(delta)
+		State.BRACKET_HANG:
+			_bracket_hang()
 	if scripted:
 		controls.end_frame()
 
@@ -101,10 +108,18 @@ func _normal(delta: float, t: Tuning) -> void:
 	if input_x != 0.0:
 		facing = int(signf(input_x))
 	var top := (t.crouch_speed if crouching else t.run_speed) * speed_scale
-	velocity.x = MovementMath.horizontal(t, velocity.x, input_x, on_floor, delta, top)
+	var forced := allomancy.force_active
+	# While a Push acts on her, ground friction does not eat the force.
+	velocity.x = MovementMath.horizontal(t, velocity.x, input_x, on_floor and not forced, delta, top)
 
-	var held := controls.jump_held and _jump_held_since_jump
-	velocity.y += MovementMath.gravity(t, velocity.y, held) * delta
+	if forced:
+		velocity.y += ForceModel.push_gravity(t, velocity.y) * delta
+		# Jump cancels downward speed mid-Push (DESIGN.md 5.4).
+		if controls.jump_pressed and not on_floor and velocity.y > 0.0:
+			velocity.y = 0.0
+	else:
+		var held := controls.jump_held and _jump_held_since_jump
+		velocity.y += MovementMath.gravity(t, velocity.y, held) * delta
 	if not controls.jump_held and _jump_held_since_jump and velocity.y < 0.0:
 		velocity.y *= t.jump_cut
 		_jump_held_since_jump = false
@@ -219,6 +234,28 @@ func _ledge_hang() -> void:
 	elif controls.move.y > 0.5 or (controls.move.x != 0.0 and signf(controls.move.x) != facing):
 		state = State.NORMAL
 		_ledge_cooldown = 0.3
+
+
+## Pulled to an anchor: hang from it by the hands until released.
+func cling_to(source: MetalSource) -> void:
+	if state == State.BRACKET_HANG:
+		return
+	state = State.BRACKET_HANG
+	_cling_source = source
+	velocity = Vector2.ZERO
+
+
+func _bracket_hang() -> void:
+	velocity = Vector2.ZERO
+	if not is_instance_valid(_cling_source):
+		state = State.NORMAL
+		return
+	global_position = _cling_source.global_position - CHEST
+	if controls.jump_pressed:
+		state = State.NORMAL
+		_jump(Game.tuning)
+	elif not controls.pull_held:
+		state = State.NORMAL
 
 
 func _process(_delta: float) -> void:

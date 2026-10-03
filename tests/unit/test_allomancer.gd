@@ -60,7 +60,7 @@ func test_lines_layer_sits_above_the_mists_and_below_the_hud() -> void:
 func test_sixty_sources_update_within_budget() -> void:
 	var w := TestWorld.create(self, [FLOOR], Vector2(0, -1))
 	for i in 60:
-		w.anchor(Vector2(-300 + (i % 12) * 50, -40 - (i / 12) * 50), 0.5 + i)
+		w.anchor(Vector2(-220 + (i % 12) * 40, -40 - (i / 12) * 40), 0.5 + i)
 	w.vin.controls.aim_active = true
 	w.vin.controls.aim_point = Vector2(20, -100)
 	await physics_frames(2)
