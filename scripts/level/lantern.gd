@@ -12,6 +12,11 @@ extends Node2D
 @export var color := Color(1.0, 0.66, 0.32)
 ## Lanterns hang from metal; the housing is a metal source.
 @export var metal := true
+## Seconds between flashes (a lamplighter unshuttering); 0 never flashes.
+@export var flash_interval := 0.0
+
+var _flash_timer := 0.0
+var _flash_glow := 0.0
 
 var light: PointLight2D
 
@@ -38,6 +43,28 @@ func _ready() -> void:
 func _update_light() -> void:
 	if light:
 		light.texture_scale = radius / 64.0
+
+
+func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint() or light == null:
+		return
+	if flash_interval > 0.0:
+		_flash_timer += delta
+		if _flash_timer >= flash_interval:
+			_flash_timer = 0.0
+			flash()
+	_flash_glow = move_toward(_flash_glow, 0.0, delta * 4.0)
+	light.energy = energy + _flash_glow * 3.0
+
+
+## Unshutters the lantern at full blaze: blinds a tin-burner who sees it.
+func flash() -> void:
+	_flash_glow = 1.0
+	var vin := get_tree().get_first_node_in_group("player") as Vin
+	if vin and vin.chest_position().distance_to(global_position) < radius * 1.5:
+		var q := PhysicsRayQueryParameters2D.create(global_position, vin.chest_position(), Layers.WORLD)
+		if get_world_2d().direct_space_state.intersect_ray(q).is_empty():
+			vin.senses.flash(global_position)
 
 
 ## True if a point is lit by this lantern.

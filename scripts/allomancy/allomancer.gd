@@ -59,7 +59,7 @@ func _update_lines_and_target() -> void:
 		return
 	var t := Game.tuning
 	for s in MetalRegistry.query(_cur_chest, t.line_range):
-		if s.body == vin:
+		if s.body == vin or (s.concealed and not vin.senses.sees_concealed()):
 			continue
 		var id := s.get_instance_id()
 		var pos := s.global_position

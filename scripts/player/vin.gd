@@ -5,8 +5,11 @@ extends CharacterBody2D
 
 signal landed(fall_speed: float)
 signal jumped
+signal hurt(hit: Hit)
+signal died
+signal crashed
 
-enum State { NORMAL, LEDGE_HANG, BRACKET_HANG }
+enum State { NORMAL, LEDGE_HANG, BRACKET_HANG, STAGGER }
 
 const HALF_WIDTH := 6.0
 const STAND_HEIGHT := 44.0
@@ -22,6 +25,15 @@ var controls := PlayerControls.new()
 var reserves := MetalReserves.new()
 var allomancy: Allomancer
 var pouch: CoinPouch
+var senses: TinSense
+var health := Health.new(100.0)
+var pewter_on := false
+var tin_on := false
+var copper_on := false
+var bronze_on := false
+## Seconds of the pewter crash left: the stagger, then the slowdown.
+var crash_time_left := 0.0
+var invulnerable := false
 ## How strongly the mists swirl toward Vin (0..1): rises while she burns
 ## metal, settles when she stops.
 var mist_strength := 0.0
@@ -46,6 +58,9 @@ var _was_on_floor := false
 var _jump_held_since_jump := false
 var _ledge_point := Vector2.ZERO
 var _cling_source: MetalSource
+var _stagger_left := 0.0
+var _stunned := false
+var _pewter := PewterBurn.new()
 
 
 func _ready() -> void:
@@ -65,6 +80,8 @@ func _ready() -> void:
 	add_child(allomancy)
 	pouch = CoinPouch.new(self)
 	add_child(pouch)
+	senses = TinSense.new(self)
+	add_child(senses)
 	var layer := CanvasLayer.new()
 	layer.name = "LinesLayer"
 	layer.layer = CanvasLayers.LINES
@@ -72,7 +89,11 @@ func _ready() -> void:
 	var lines_node := BlueLines.new()
 	lines_node.allomancer = allomancy
 	layer.add_child(lines_node)
+	var overlay := SenseOverlay.new()
+	overlay.vin = self
+	layer.add_child(overlay)
 	add_child(layer)
+	health.died.connect(func(): died.emit())
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -89,8 +110,11 @@ func _physics_process(delta: float) -> void:
 	_ledge_cooldown = maxf(_ledge_cooldown - delta, 0.0)
 	_wall_jump_lock = maxf(_wall_jump_lock - delta, 0.0)
 
-	pouch.physics_update(delta)
-	allomancy.physics_update(delta)
+	_burn_toggles(delta, t)
+	senses.physics_update(delta)
+	if state != State.STAGGER:
+		pouch.physics_update(delta)
+		allomancy.physics_update(delta)
 	match state:
 		State.NORMAL:
 			_normal(delta, t)
@@ -98,6 +122,8 @@ func _physics_process(delta: float) -> void:
 			_ledge_hang()
 		State.BRACKET_HANG:
 			_bracket_hang()
+		State.STAGGER:
+			_stagger(delta, t)
 	_update_mist_pull(delta)
 	if scripted:
 		controls.end_frame()
@@ -109,7 +135,102 @@ func _exit_tree() -> void:
 
 ## True while any metal burns: Push or Pull acting, or a toggled metal on.
 func burning_metal() -> bool:
-	return allomancy.force_active
+	return allomancy.force_active or pewter_on or tin_on or copper_on or bronze_on
+
+
+func pewter_flared() -> bool:
+	return pewter_on and controls.flare_held
+
+
+## Keys 1 to 4 toggle pewter, tin, copper and bronze; each burns
+## continuously while on and goes out when its reserve is empty.
+func _burn_toggles(delta: float, t: Tuning) -> void:
+	var c := controls
+	if c.toggle_pewter:
+		pewter_on = not pewter_on and reserves.has(MetalReserves.Metal.PEWTER)
+	if c.toggle_tin:
+		tin_on = not tin_on and reserves.has(MetalReserves.Metal.TIN)
+	if c.toggle_copper:
+		copper_on = not copper_on and reserves.has(MetalReserves.Metal.COPPER)
+	if c.toggle_bronze:
+		bronze_on = not bronze_on and reserves.has(MetalReserves.Metal.BRONZE)
+	var flared := pewter_flared()
+	if pewter_on:
+		reserves.burn(MetalReserves.Metal.PEWTER, delta, flared)
+		health.heal(t.pewter_regen * delta)
+	if _pewter.update(delta, pewter_on, flared, reserves.has(MetalReserves.Metal.PEWTER), t):
+		_crash(t)
+	if pewter_on and not reserves.has(MetalReserves.Metal.PEWTER):
+		pewter_on = false
+	tin_on = tin_on and reserves.burn(MetalReserves.Metal.TIN, delta, c.flare_held) and reserves.has(MetalReserves.Metal.TIN)
+	copper_on = copper_on and reserves.burn(MetalReserves.Metal.COPPER, delta, false) and reserves.has(MetalReserves.Metal.COPPER)
+	bronze_on = bronze_on and reserves.burn(MetalReserves.Metal.BRONZE, delta, false) and reserves.has(MetalReserves.Metal.BRONZE)
+
+	crash_time_left = maxf(crash_time_left - delta, 0.0)
+	var slowed := crash_time_left > 0.0 and crash_time_left <= t.crash_slow_seconds
+	speed_scale = (t.pewter_flare_speed if flared else (t.pewter_speed if pewter_on else 1.0))
+	jump_scale = (t.pewter_flare_jump if flared else (t.pewter_jump if pewter_on else 1.0))
+	if slowed:
+		speed_scale *= t.crash_slow_speed
+
+
+func _crash(t: Tuning) -> void:
+	pewter_on = false
+	crash_time_left = t.crash_stagger + t.crash_slow_seconds
+	_enter_stagger(t.crash_stagger)
+	crashed.emit()
+
+
+## A blow lands on Vin. Pewter halves damage (quarters flared) and shrugs off
+## light hits without staggering.
+func take_hit(hit: Hit) -> bool:
+	if invulnerable or health.is_dead():
+		return false
+	var t := Game.tuning
+	var mult := 1.0
+	if pewter_flared():
+		mult = t.pewter_flare_damage
+	elif pewter_on:
+		mult = t.pewter_damage
+	health.damage(hit.damage * mult)
+	hurt.emit(hit)
+	if not (pewter_on and hit.light):
+		velocity += hit.direction * 120.0
+		_enter_stagger(t.light_hit_stagger if hit.light else t.heavy_hit_stagger)
+	return true
+
+
+func _enter_stagger(time: float) -> void:
+	state = State.STAGGER
+	_stagger_left = maxf(_stagger_left, time)
+	crouching = false
+	_apply_shape()
+
+
+## Blinded by a flash: no control for a moment.
+func stun(time: float) -> void:
+	_stunned = true
+	_enter_stagger(time)
+
+
+func stunned() -> bool:
+	return _stunned and state == State.STAGGER
+
+
+func clear_stun() -> void:
+	if _stunned:
+		_stunned = false
+		_stagger_left = 0.0
+
+
+func _stagger(delta: float, t: Tuning) -> void:
+	_stagger_left -= delta
+	velocity.x = move_toward(velocity.x, 0.0, t.ground_decel * delta)
+	velocity.y = minf(velocity.y + MovementMath.gravity(t, velocity.y, false) * delta, t.max_fall_speed)
+	move_and_slide()
+	if _stagger_left <= 0.0:
+		_stunned = false
+		state = State.NORMAL
 
 
 func _update_mist_pull(delta: float) -> void:
@@ -165,6 +286,10 @@ func _normal(delta: float, t: Tuning) -> void:
 		_correct_corners(delta, t)
 	var fall_speed := velocity.y
 	move_and_slide()
+	for i in get_slide_collision_count():
+		var other := get_slide_collision(i).get_collider()
+		if other and other.has_method("shoulder"):
+			other.shoulder(self)
 	if is_on_floor() and not _was_on_floor:
 		landed.emit(fall_speed)
 	_was_on_floor = is_on_floor()

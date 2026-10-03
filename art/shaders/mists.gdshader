@@ -21,6 +21,9 @@ uniform float thickness = 0.35;
 // Tin thins the mists for the viewer; Steelsight tints them bluer.
 uniform float thin = 0.0;
 uniform float blue_tint = 0.0;
+// Vin's visible radius (tin triples it): beyond it the night closes in.
+uniform vec2 vision_center;
+uniform float vision_radius = 100000.0;
 uniform vec4 mist_color : source_color = vec4(0.60, 0.65, 0.74, 1.0);
 uniform vec4 steel_color : source_color = vec4(0.55, 0.68, 0.95, 1.0);
 const float ATTRACT_RADIUS = 90.0;
@@ -71,5 +74,9 @@ void fragment() {
 	density *= open_air;
 	density *= 1.0 - thin * 0.75;
 	vec3 col = mix(mist_color.rgb, steel_color.rgb, blue_tint);
-	COLOR = vec4(col, clamp(density, 0.0, 0.62));
+	float alpha = clamp(density, 0.0, 0.62);
+	float outside = smoothstep(vision_radius * 0.55, vision_radius, distance(world, vision_center));
+	col = mix(col, vec3(0.025, 0.03, 0.045), outside * 0.8);
+	alpha = max(alpha, outside * 0.6);
+	COLOR = vec4(col, alpha);
 }

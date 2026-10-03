@@ -11,6 +11,7 @@ var push_held := false
 var pull_pressed := false
 var pull_held := false
 var flare_held := false
+var flare_pressed := false
 var coin_pressed := false
 var coin_held := false
 var dagger_pressed := false
@@ -60,6 +61,7 @@ func read_device(owner: Node2D, delta: float) -> void:
 	pull_pressed = Input.is_action_just_pressed("pull")
 	pull_held = Input.is_action_pressed("pull")
 	flare_held = Input.is_action_pressed("flare")
+	flare_pressed = Input.is_action_just_pressed("flare")
 	coin_pressed = Input.is_action_just_pressed("coin")
 	coin_held = Input.is_action_pressed("coin")
 	dagger_pressed = Input.is_action_just_pressed("dagger")
@@ -102,6 +104,7 @@ func read_device(owner: Node2D, delta: float) -> void:
 ## mode so a test's "press" lasts exactly one frame.
 func end_frame() -> void:
 	jump_pressed = false
+	flare_pressed = false
 	push_pressed = false
 	pull_pressed = false
 	coin_pressed = false

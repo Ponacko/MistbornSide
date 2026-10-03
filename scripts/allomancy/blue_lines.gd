@@ -22,6 +22,9 @@ func _draw() -> void:
 	var chest := allomancer.interpolated_chest(f)
 	var pulse := 0.75 + 0.25 * sin(_time * 6.0)
 	for line in allomancer.lines:
+		# A coin can be pouched between the physics frame and this draw.
+		if not is_instance_valid(line.source):
+			continue
 		var to := allomancer.interpolated_position(line.id, f)
 		var is_target: bool = line.source == allomancer.target
 		var a: float = line.alpha

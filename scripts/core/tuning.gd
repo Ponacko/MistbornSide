@@ -67,6 +67,26 @@ func jump_speed() -> float:
 @export var corner_correction := 6
 @export var ledge_correction := 6
 
+@export_group("Pewter and tin")
+@export var pewter_speed := 1.4
+@export var pewter_jump := 1.3
+@export var pewter_damage := 0.5
+@export var pewter_flare_speed := 1.9
+@export var pewter_flare_jump := 1.45
+@export var pewter_flare_damage := 0.25
+@export var pewter_regen := 1.5
+## Continuous pewter flare that ends in a crash, in seconds.
+@export var crash_flare_seconds := 40.0
+@export var crash_stagger := 2.0
+@export var crash_slow_seconds := 10.0
+@export var crash_slow_speed := 0.7
+@export var light_hit_stagger := 0.35
+@export var heavy_hit_stagger := 0.6
+## How far Vin sees in the mists without tin; tin triples it.
+@export var vision_radius := 170.0
+@export var tin_flash_stun := 1.0
+@export var tin_pulse_time := 0.6
+
 @export_group("Coins")
 @export var coin_pouch_size := 30
 @export var coin_flick_speed := 220.0

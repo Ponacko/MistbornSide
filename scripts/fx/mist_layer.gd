@@ -89,6 +89,10 @@ func _process(delta: float) -> void:
 		_material.set_shader_parameter("attractors", _pad(att))
 	if not rep.is_empty():
 		_material.set_shader_parameter("repellers", _pad(rep))
+	if _vin:
+		thin = _vin.senses.mist_thin()
+		_material.set_shader_parameter("vision_center", _vin.chest_position())
+		_material.set_shader_parameter("vision_radius", _vin.senses.vision_radius())
 	_material.set_shader_parameter("thin", thin)
 	var aiming := _vin != null and _vin.allomancy.steelsight.time_scale(Game.tuning) < 1.0
 	_material.set_shader_parameter("blue_tint", 0.35 if aiming else 0.0)

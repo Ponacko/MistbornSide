@@ -5,9 +5,32 @@ extends SceneTree
 
 var _failed := 0
 var _passed := 0
+var _errors := ErrorCatcher.new()
+
+
+## Turns script errors raised during a test into failures of that test.
+class ErrorCatcher:
+	extends Logger
+	var errors: PackedStringArray = []
+	var _mutex := Mutex.new()
+
+	func _log_error(function: String, file: String, line: int, code: String, rationale: String, _editor_notify: bool, error_type: int, _script_backtrace: Array[ScriptBacktrace]) -> void:
+		if error_type != ERROR_TYPE_SCRIPT and error_type != ERROR_TYPE_ERROR:
+			return
+		_mutex.lock()
+		errors.append("%s %s (%s:%d %s)" % [code, rationale, file.get_file(), line, function])
+		_mutex.unlock()
+
+	func take() -> PackedStringArray:
+		_mutex.lock()
+		var out := errors.duplicate()
+		errors.clear()
+		_mutex.unlock()
+		return out
 
 
 func _initialize() -> void:
+	OS.add_logger(_errors)
 	_run.call_deferred()
 
 
@@ -51,10 +74,13 @@ func _run_file(path: String) -> void:
 		var t: TestCase = script.new()
 		t.tree = self
 		await _reset_world()
+		_errors.take()
 		t.before_each()
 		await t.call(method)
 		t.after_each()
 		t.free_nodes()
+		for e in _errors.take():
+			t.failures.append("error: " + e)
 		if t.failures.is_empty():
 			_passed += 1
 			print("  ok   %s::%s" % [path.get_file(), method])

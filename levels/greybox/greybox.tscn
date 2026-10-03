@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
@@ -13,6 +13,10 @@
 [ext_resource type="Script" path="res://scripts/fx/mist_interior.gd" id="11"]
 [ext_resource type="Script" path="res://scripts/fx/mist_repeller.gd" id="12"]
 [ext_resource type="Script" path="res://scripts/level/backdrop.gd" id="13"]
+[ext_resource type="Script" path="res://scripts/fx/screen_fx.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/level/noise_emitter.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/combat/hazard.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/level/weak_board.gd" id="17"]
 
 [node name="Greybox" type="Node2D"]
 
@@ -178,12 +182,42 @@ script = ExtResource("8")
 position = Vector2(1140, -64)
 script = ExtResource("8")
 
+[node name="HiddenPatrol" type="Node2D" parent="."]
+position = Vector2(-210, -10)
+script = ExtResource("15")
+walk_distance = 40.0
+
+[node name="Whisper" type="Node2D" parent="."]
+position = Vector2(-150, -30)
+script = ExtResource("15")
+kind = 1
+loudness = 0.4
+interval = 2.0
+
+[node name="Lamplighter" type="Node2D" parent="."]
+position = Vector2(660, -40)
+script = ExtResource("10")
+flash_interval = 3.0
+metal = false
+
+[node name="Embers" type="Area2D" parent="."]
+position = Vector2(80, -6)
+script = ExtResource("16")
+
+[node name="Board" type="StaticBody2D" parent="."]
+position = Vector2(-120, -62)
+script = ExtResource("17")
+size = Vector2(8, 62)
+
 [node name="Vial1" type="Area2D" parent="."]
 position = Vector2(940, -80)
 script = ExtResource("7")
 
 [node name="Hud" type="CanvasLayer" parent="."]
 script = ExtResource("6")
+
+[node name="ScreenFx" type="CanvasLayer" parent="."]
+script = ExtResource("14")
 
 [node name="Debug" type="CanvasLayer" parent="."]
 layer = 100
