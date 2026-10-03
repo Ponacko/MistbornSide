@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
@@ -8,8 +8,25 @@
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/level/vial_pickup.gd" id="7"]
 [ext_resource type="Script" path="res://scripts/combat/target_dummy.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/fx/night_atmosphere.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/level/lantern.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/fx/mist_interior.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/fx/mist_repeller.gd" id="12"]
+[ext_resource type="Script" path="res://scripts/level/backdrop.gd" id="13"]
 
 [node name="Greybox" type="Node2D"]
+
+[node name="Backdrop" type="Node2D" parent="."]
+position = Vector2(-320, -420)
+script = ExtResource("13")
+size = Vector2(1640, 420)
+color = Color(0.16, 0.16, 0.19, 1)
+
+[node name="HutBack" type="Node2D" parent="."]
+position = Vector2(-250, -62)
+script = ExtResource("13")
+size = Vector2(140, 62)
+color = Color(0.3, 0.24, 0.2, 1)
 
 [node name="Geometry" type="Node2D" parent="."]
 
@@ -63,6 +80,16 @@ position = Vector2(-320, -400)
 script = ExtResource("1")
 size = Vector2(32, 400)
 
+[node name="HutRoof" type="StaticBody2D" parent="Geometry"]
+position = Vector2(-260, -72)
+script = ExtResource("1")
+size = Vector2(150, 10)
+
+[node name="HutWall" type="StaticBody2D" parent="Geometry"]
+position = Vector2(-260, -62)
+script = ExtResource("1")
+size = Vector2(10, 40)
+
 [node name="Metal" type="Node2D" parent="."]
 
 [node name="Bracket1" type="Node2D" parent="Metal"]
@@ -104,6 +131,36 @@ style = 1
 position = Vector2(1150, -150)
 script = ExtResource("5")
 style = 2
+
+[node name="Night" type="Node2D" parent="."]
+script = ExtResource("9")
+
+[node name="HutInterior" type="Node2D" parent="."]
+position = Vector2(-250, -62)
+script = ExtResource("11")
+size = Vector2(140, 62)
+
+[node name="Lantern1" type="Node2D" parent="."]
+position = Vector2(-60, -90)
+script = ExtResource("10")
+
+[node name="Lantern2" type="Node2D" parent="."]
+position = Vector2(860, -110)
+script = ExtResource("10")
+
+[node name="HutLantern" type="Node2D" parent="."]
+position = Vector2(-180, -50)
+script = ExtResource("10")
+radius = 70.0
+metal = false
+
+[node name="SpikedStatue" type="StaticBody2D" parent="."]
+position = Vector2(1250, 0)
+script = ExtResource("8")
+
+[node name="Repeller" type="Node2D" parent="SpikedStatue"]
+position = Vector2(0, -30)
+script = ExtResource("12")
 
 [node name="Vin" parent="." instance=ExtResource("2")]
 position = Vector2(0, -1)

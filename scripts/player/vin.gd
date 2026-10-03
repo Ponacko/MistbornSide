@@ -22,6 +22,10 @@ var controls := PlayerControls.new()
 var reserves := MetalReserves.new()
 var allomancy: Allomancer
 var pouch: CoinPouch
+## How strongly the mists swirl toward Vin (0..1): rises while she burns
+## metal, settles when she stops.
+var mist_strength := 0.0
+var mist_phase := 0.0
 var body_mass: float:
 	get:
 		return Game.tuning.vin_mass
@@ -56,6 +60,7 @@ func _ready() -> void:
 	add_child(_shape)
 	_forgiveness = JumpForgiveness.new(Game.tuning.coyote_time, Game.tuning.jump_buffer)
 	add_to_group("player")
+	MistField.add_attractor(self)
 	allomancy = Allomancer.new(self)
 	add_child(allomancy)
 	pouch = CoinPouch.new(self)
@@ -93,8 +98,25 @@ func _physics_process(delta: float) -> void:
 			_ledge_hang()
 		State.BRACKET_HANG:
 			_bracket_hang()
+	_update_mist_pull(delta)
 	if scripted:
 		controls.end_frame()
+
+
+func _exit_tree() -> void:
+	MistField.remove_attractor(self)
+
+
+## True while any metal burns: Push or Pull acting, or a toggled metal on.
+func burning_metal() -> bool:
+	return allomancy.force_active
+
+
+func _update_mist_pull(delta: float) -> void:
+	var target := 1.0 if burning_metal() else 0.0
+	var rate := 2.0 if target > mist_strength else 0.7
+	mist_strength = move_toward(mist_strength, target, rate * delta)
+	mist_phase += mist_strength * delta * 1.6
 
 
 func chest_position() -> Vector2:

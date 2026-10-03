@@ -27,6 +27,8 @@ var _prev_positions := {}
 var _cur_positions := {}
 var _prev_chest := Vector2.ZERO
 var _cur_chest := Vector2.ZERO
+var _ray: PhysicsRayQueryParameters2D
+var _space: PhysicsDirectSpaceState2D
 
 
 func _init(owner_vin: Vin) -> void:
@@ -228,8 +230,12 @@ func _context() -> TargetScorer.Context:
 ## True if level geometry lies between the two points. A hit right at the
 ## source is the wall the metal is fixed into, not an obstruction.
 func _blocked(from: Vector2, to: Vector2) -> bool:
-	var q := PhysicsRayQueryParameters2D.create(from, to, Layers.WORLD, [vin.get_rid()])
-	var hit := vin.get_world_2d().direct_space_state.intersect_ray(q)
+	if _ray == null:
+		_ray = PhysicsRayQueryParameters2D.create(from, to, Layers.WORLD, [vin.get_rid()])
+		_space = vin.get_world_2d().direct_space_state
+	_ray.from = from
+	_ray.to = to
+	var hit := _space.intersect_ray(_ray)
 	return not hit.is_empty() and (hit.position as Vector2).distance_to(to) > 6.0
 
 

@@ -64,9 +64,13 @@ func test_sixty_sources_update_within_budget() -> void:
 	w.vin.controls.aim_active = true
 	w.vin.controls.aim_point = Vector2(20, -100)
 	await physics_frames(2)
-	var start := Time.get_ticks_usec()
-	for i in 60:
-		w.vin.allomancy.physics_update(1.0 / 60.0)
-	var per_frame_ms := (Time.get_ticks_usec() - start) / 60.0 / 1000.0
+	# Best of three batches, so a scheduler hiccup on the test machine does
+	# not read as a regression.
+	var per_frame_ms := INF
+	for batch in 3:
+		var start := Time.get_ticks_usec()
+		for i in 60:
+			w.vin.allomancy.physics_update(1.0 / 60.0)
+		per_frame_ms = minf(per_frame_ms, (Time.get_ticks_usec() - start) / 60.0 / 1000.0)
 	assert_eq(w.vin.allomancy.lines.size(), 60)
 	assert_lt(per_frame_ms, 1.5, "ms per update")
