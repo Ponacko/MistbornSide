@@ -4,30 +4,27 @@ class_name PushPhysics
 ## opposite.
 
 
-## impulse: vector applied to the target (away from Vin for a Push).
+## impulse: vector applied to the target (away from Vin for a Push). Bodies
+## with their own rules (coins on the ground, characters) implement
+## receive_push(impulse, source) -> Vector2.
 static func deliver(source: MetalSource, impulse: Vector2, vin_mass: float, t: Tuning) -> Vector2:
-	var magnitude := impulse.length()
-	if magnitude == 0.0:
+	if impulse == Vector2.ZERO:
 		return Vector2.ZERO
-	var dir := impulse / magnitude
+	if source.body and source.body.has_method("receive_push"):
+		return source.body.receive_push(impulse, source)
 	match source.kind:
-		MetalSource.Kind.ANCHORED:
-			return impulse
 		MetalSource.Kind.DYNAMIC:
-			var rb := source.body as RigidBody2D
-			if rb == null:
-				return impulse
-			if rb.has_method("push_mass_override"):
-				var override: float = rb.push_mass_override(dir)
-				if is_inf(override):
-					return impulse
-			var along := rb.linear_velocity.dot(dir)
-			var cap := maxf(t.projectile_max_speed - along, 0.0)
-			var r := ForceModel.split(magnitude, vin_mass, rb.mass, cap)
-			rb.apply_central_impulse(dir * r.target_dv * rb.mass)
-			return dir * r.target_dv * rb.mass
-		MetalSource.Kind.CARRIED:
-			if source.body and source.body.has_method("receive_push"):
-				return source.body.receive_push(impulse, source)
-			return impulse
+			if source.body is RigidBody2D:
+				return dynamic(source.body, impulse, vin_mass, t)
 	return impulse
+
+
+## A free rigid body shares the impulse by mass, its speed change capped.
+static func dynamic(rb: RigidBody2D, impulse: Vector2, vin_mass: float, t: Tuning) -> Vector2:
+	var magnitude := impulse.length()
+	var dir := impulse / magnitude
+	var along := rb.linear_velocity.dot(dir)
+	var cap := maxf(t.projectile_max_speed - along, 0.0)
+	var r := ForceModel.split(magnitude, vin_mass, rb.mass, cap)
+	rb.apply_central_impulse(dir * r.target_dv * rb.mass)
+	return dir * r.target_dv * rb.mass

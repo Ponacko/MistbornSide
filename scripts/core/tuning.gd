@@ -53,6 +53,27 @@ func jump_speed() -> float:
 ## Pulling to an anchor closer than this makes Vin cling to it.
 @export var bracket_catch_distance := 14.0
 
+@export_group("Coins")
+@export var coin_pouch_size := 30
+@export var coin_flick_speed := 220.0
+## A resting coin is an anchor for Pushes within this angle of the surface
+## normal (Kelsier's centre-of-mass lesson); outside it the coin skids.
+@export var anchor_cone_degrees := 35.0
+## Share of an anchor's lift Vin gets when a Push outside the cone skids the coin.
+@export var coin_partial_lift := 0.5
+@export var coin_skid_speed := 160.0
+## Push coyote time: a coin that left the ground this many frames ago still anchors.
+@export var coin_coyote_frames := 5
+## A bouncing coin slower than this, just above the ground, still anchors.
+@export var coin_bounce_accept_speed := 60.0
+@export var coin_lethal_speed := 320.0
+@export var coin_spray_count := 5
+@export var coin_spray_spread_degrees := 30.0
+@export var coin_recall_speed := 520.0
+@export var coin_recall_accel := 4000.0
+@export var coin_max_active := 60
+@export var coin_merge_radius := 7.0
+
 @export_group("Lines and targeting")
 ## Range of the blue lines and of Push and Pull, in pixels (half a screen
 ## width); force falls smoothly to zero here.

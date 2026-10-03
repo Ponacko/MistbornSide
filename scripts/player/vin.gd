@@ -21,6 +21,7 @@ const LEDGE_HAND_Y := -40.0
 var controls := PlayerControls.new()
 var reserves := MetalReserves.new()
 var allomancy: Allomancer
+var pouch: CoinPouch
 var body_mass: float:
 	get:
 		return Game.tuning.vin_mass
@@ -57,6 +58,8 @@ func _ready() -> void:
 	add_to_group("player")
 	allomancy = Allomancer.new(self)
 	add_child(allomancy)
+	pouch = CoinPouch.new(self)
+	add_child(pouch)
 	var layer := CanvasLayer.new()
 	layer.name = "LinesLayer"
 	layer.layer = CanvasLayers.LINES
@@ -81,6 +84,7 @@ func _physics_process(delta: float) -> void:
 	_ledge_cooldown = maxf(_ledge_cooldown - delta, 0.0)
 	_wall_jump_lock = maxf(_wall_jump_lock - delta, 0.0)
 
+	pouch.physics_update(delta)
 	allomancy.physics_update(delta)
 	match state:
 		State.NORMAL:

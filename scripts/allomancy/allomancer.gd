@@ -100,10 +100,14 @@ func _apply_force(delta: float) -> void:
 	if not vin.reserves.has(metal):
 		locked = null
 		return
+	if mode == Mode.PULL:
+		_pouch_arriving_coins()
 	if not _valid(locked):
 		locked = target
 	if not _valid(locked):
 		locked = null
+		if mode == Mode.PULL:
+			_recall(delta)
 		return
 	var t := Game.tuning
 	var to_source := locked.global_position - _cur_chest
@@ -125,6 +129,24 @@ func _apply_force(delta: float) -> void:
 	force_dir = vin_dir
 	if mode == Mode.PULL and locked.kind == MetalSource.Kind.ANCHORED and d < t.bracket_catch_distance:
 		vin.cling_to(locked)
+
+
+## Holding Pull with no target: every loose coin in range flies back.
+func _recall(delta: float) -> void:
+	var any := false
+	for s in MetalRegistry.query(_cur_chest, Game.tuning.line_range):
+		if s.body is Coin and not s.inside_body:
+			(s.body as Coin).recall_toward(_cur_chest, delta)
+			any = true
+	if any:
+		vin.reserves.burn(MetalReserves.Metal.IRON, delta, vin.controls.flare_held)
+
+
+## Coins Pulled into Vin's hands go back in the pouch.
+func _pouch_arriving_coins() -> void:
+	for s in MetalRegistry.query(_cur_chest, 16.0):
+		if s.body is Coin and (s.body as Coin).count > 0:
+			vin.pouch.pouch(s.body)
 
 
 func _valid(s: MetalSource) -> bool:

@@ -3,6 +3,9 @@ extends Node2D
 ## Draws Vin's blue lines on their own canvas layer, above the mists and below
 ## the HUD (DESIGN.md 5.3).
 
+const ARROW_MIN := 5.0
+const ARROW_SPAN := 26.0
+
 var allomancer: Allomancer
 var _time := 0.0
 
@@ -35,6 +38,25 @@ func _draw() -> void:
 		draw_line(chest, to, color, w, true)
 		if is_target:
 			_glyph(to, color)
+			_preview_arrows(chest, to, line.source)
+
+
+## Two arrows scaled by the mass ratio: long on whichever side will move.
+func _preview_arrows(chest: Vector2, to: Vector2, source: MetalSource) -> void:
+	var away := (to - chest).normalized()
+	var pulling := allomancer.vin.controls.pull_held and not allomancer.vin.controls.push_held
+	var on_target := -away if pulling else away
+	var s := PushPreview.shares(source, on_target, Game.tuning.vin_mass)
+	_arrow(chest, -on_target, ARROW_MIN + ARROW_SPAN * s.vin)
+	_arrow(to, on_target, ARROW_MIN + ARROW_SPAN * s.target)
+
+
+func _arrow(from: Vector2, dir: Vector2, length: float) -> void:
+	var tip := from + dir * length
+	var color := Color(0.85, 0.93, 1.0, 0.9)
+	draw_line(from, tip, color, 1.0, true)
+	draw_line(tip, tip - dir.rotated(0.5) * 4.0, color, 1.0, true)
+	draw_line(tip, tip - dir.rotated(-0.5) * 4.0, color, 1.0, true)
 
 
 func _glyph(at: Vector2, color: Color) -> void:

@@ -12,6 +12,7 @@ var pull_pressed := false
 var pull_held := false
 var flare_held := false
 var coin_pressed := false
+var coin_held := false
 var dagger_pressed := false
 var dagger_held := false
 var dagger_released := false
@@ -54,6 +55,7 @@ func read_device(owner: Node2D, delta: float) -> void:
 	pull_held = Input.is_action_pressed("pull")
 	flare_held = Input.is_action_pressed("flare")
 	coin_pressed = Input.is_action_just_pressed("coin")
+	coin_held = Input.is_action_pressed("coin")
 	dagger_pressed = Input.is_action_just_pressed("dagger")
 	dagger_held = Input.is_action_pressed("dagger")
 	dagger_released = Input.is_action_just_released("dagger")

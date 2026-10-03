@@ -43,6 +43,9 @@ func _draw_hud() -> void:
 	for m in MetalReserves.Metal.values():
 		_vial(Vector2(x, ORIGIN.y), vin.reserves.fraction(m), METAL_COLORS[m])
 		x += VIAL_SIZE.x + VIAL_GAP
+	x += 6.0
+	_canvas.draw_rect(Rect2(x, ORIGIN.y + VIAL_SIZE.y - 5, 5, 4), Color(0.8, 0.55, 0.35))
+	_canvas.draw_string(ThemeDB.fallback_font, Vector2(x + 8, ORIGIN.y + VIAL_SIZE.y), str(vin.pouch.count), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.85, 0.85, 0.9, 0.85))
 
 
 func _vial(at: Vector2, fill: float, color: Color) -> void:
