@@ -15,6 +15,7 @@ const HALF_WIDTH := 6.0
 const STAND_HEIGHT := 44.0
 const CROUCH_HEIGHT := 26.0
 const CHEST := Vector2(0, -30)
+const SHOULDERS := Vector2(0, -36)
 const LEDGE_REACH := 7.0
 const LEDGE_HAND_Y := -40.0
 
@@ -26,6 +27,15 @@ var reserves := MetalReserves.new()
 var allomancy: Allomancer
 var pouch: CoinPouch
 var senses: TinSense
+var cloak: Mistcloak
+## Vin wears the mistcloak; Valette's gowns turn it off (DESIGN.md 4).
+var wears_cloak := true:
+	set(value):
+		wears_cloak = value
+		if cloak:
+			cloak.visible = value
+			if value:
+				cloak.reset(global_position + SHOULDERS)
 var health := Health.new(100.0)
 var pewter_on := false
 var tin_on := false
@@ -82,6 +92,19 @@ func _ready() -> void:
 	add_child(pouch)
 	senses = TinSense.new(self)
 	add_child(senses)
+	# The mists are faintly luminescent: Vin is never a black hole in the night.
+	var glow := PointLight2D.new()
+	glow.name = "MistGlow"
+	glow.texture = Lantern._light_texture()
+	glow.texture_scale = 0.9
+	glow.color = Color(0.62, 0.68, 0.85)
+	glow.energy = 0.9
+	glow.position = CHEST
+	add_child(glow)
+	cloak = Mistcloak.new()
+	cloak.name = "Mistcloak"
+	add_child(cloak)
+	cloak.reset(global_position + SHOULDERS)
 	var layer := CanvasLayer.new()
 	layer.name = "LinesLayer"
 	layer.layer = CanvasLayers.LINES
@@ -125,6 +148,9 @@ func _physics_process(delta: float) -> void:
 		State.STAGGER:
 			_stagger(delta, t)
 	_update_mist_pull(delta)
+	if wears_cloak:
+		var shoulders := global_position + (Vector2(0, -20) if crouching else SHOULDERS)
+		cloak.step(delta, shoulders, velocity, facing)
 	if scripted:
 		controls.end_frame()
 
@@ -438,7 +464,7 @@ func _process(_delta: float) -> void:
 ## Placeholder art until the character art pass.
 func _draw() -> void:
 	var h := CROUCH_HEIGHT if crouching else STAND_HEIGHT
-	draw_rect(Rect2(-HALF_WIDTH, -h, HALF_WIDTH * 2.0, h), Color(0.16, 0.16, 0.2))
+	draw_rect(Rect2(-HALF_WIDTH, -h, HALF_WIDTH * 2.0, h), Color(0.3, 0.29, 0.34))
 	draw_rect(Rect2(-HALF_WIDTH + 1, -h, HALF_WIDTH * 2.0 - 2, 10), Color(0.85, 0.72, 0.62))
 	draw_rect(Rect2(-HALF_WIDTH, -h, HALF_WIDTH * 2.0, 4), Color(0.05, 0.05, 0.06))
 	draw_rect(Rect2(facing * 2.0 - 1.0, -h + 5, 2, 2), Color.BLACK)
