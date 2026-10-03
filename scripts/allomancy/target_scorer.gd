@@ -39,9 +39,13 @@ static func pick(candidates: Array, ctx: Context) -> Dictionary:
 ## Candidates within radius of the aim point (cycle radius by default), best first.
 static func ranked(candidates: Array, ctx: Context, radius := -1.0) -> Array:
 	var limit := ctx.cycle_radius if radius < 0.0 else radius
-	var near := candidates.filter(func(c): return (c.pos as Vector2).distance_to(ctx.aim_point) <= limit)
-	near.sort_custom(func(a, b): return cursor_score(a, ctx) < cursor_score(b, ctx))
-	return near
+	var limit2 := limit * limit
+	var scored := []
+	for c in candidates:
+		if (c.pos as Vector2).distance_squared_to(ctx.aim_point) <= limit2:
+			scored.append([cursor_score(c, ctx), c])
+	scored.sort_custom(func(a, b): return a[0] < b[0])
+	return scored.map(func(p): return p[1])
 
 
 static func _heuristic(candidates: Array, ctx: Context) -> Dictionary:

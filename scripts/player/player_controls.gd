@@ -29,11 +29,17 @@ var target_cycle := 0
 ## heuristic takes over.
 var aim_point := Vector2.ZERO
 var aim_active := false
+## True on frames where the player deliberately moved the aim (mouse or
+## stick), as opposed to the camera carrying the cursor's world point along.
+var aim_moved := false
+## True when the last aim input came from a gamepad.
+var gamepad := false
 
 const AIM_IDLE_TIME := 1.5
 var _last_mouse := Vector2.INF
 var _mouse_idle := 0.0
 var _wheel := 0
+var _last_stick := Vector2.ZERO
 
 
 ## Mouse wheel arrives as events, not polled actions; the owner forwards them.
@@ -73,14 +79,20 @@ func read_device(owner: Node2D, delta: float) -> void:
 
 	var stick := Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
 	var mouse := owner.get_viewport().get_mouse_position()
+	aim_moved = false
 	if mouse.distance_to(_last_mouse) > 0.5:
+		aim_moved = _last_mouse != Vector2.INF
 		_mouse_idle = 0.0
 		_last_mouse = mouse
+		gamepad = false
 	else:
 		_mouse_idle += delta
 	if stick.length() > 0.3:
+		aim_moved = aim_moved or stick.distance_to(_last_stick) > 0.05
+		_last_stick = stick
 		aim_point = owner.global_position + stick * 160.0
 		aim_active = true
+		gamepad = true
 	else:
 		aim_point = owner.get_global_mouse_position()
 		aim_active = _mouse_idle < AIM_IDLE_TIME
@@ -102,3 +114,4 @@ func end_frame() -> void:
 	toggle_bronze = false
 	interact_pressed = false
 	target_cycle = 0
+	aim_moved = false

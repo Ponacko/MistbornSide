@@ -139,6 +139,8 @@ func _normal(delta: float, t: Tuning) -> void:
 		_forgiveness.clear_press()
 		_wall_jump(t)
 
+	if not on_floor:
+		_correct_corners(delta, t)
 	var fall_speed := velocity.y
 	move_and_slide()
 	if is_on_floor() and not _was_on_floor:
@@ -146,6 +148,26 @@ func _normal(delta: float, t: Tuning) -> void:
 	_was_on_floor = is_on_floor()
 	if not is_on_floor() and velocity.y >= 0.0:
 		_try_ledge_grab()
+
+
+## Celeste-style corner correction: rising into a ceiling edge nudges Vin
+## sideways past it; flying into a ledge lip lifts her over it.
+func _correct_corners(delta: float, t: Tuning) -> void:
+	var motion := velocity * delta
+	var xf := global_transform
+	if velocity.y < 0.0 and test_move(xf, Vector2(0, motion.y)):
+		for i in range(1, t.corner_correction + 1):
+			for dir in [1, -1]:
+				var off := Vector2(dir * i, 0)
+				if not test_move(xf, off) and not test_move(xf.translated(off), Vector2(0, motion.y)):
+					global_position += off
+					return
+	if absf(velocity.x) > 1.0 and test_move(xf, Vector2(motion.x, 0)):
+		for i in range(1, t.ledge_correction + 1):
+			var up := Vector2(0, -i)
+			if not test_move(xf, up) and not test_move(xf.translated(up), Vector2(motion.x, 0)):
+				global_position += up
+				return
 
 
 func _jump(t: Tuning) -> void:

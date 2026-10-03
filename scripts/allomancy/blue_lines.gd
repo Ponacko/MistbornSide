@@ -39,6 +39,16 @@ func _draw() -> void:
 		if is_target:
 			_glyph(to, color)
 			_preview_arrows(chest, to, line.source)
+		elif allomancer.cycle_candidates.has(line.source):
+			draw_arc(to, 3.0, 0.0, TAU, 8, Color(BlueLineStyle.COLOR, 0.6), 1.0, true)
+	if allomancer.shows_arc():
+		_arc(allomancer.predicted_arc())
+
+
+func _arc(points: PackedVector2Array) -> void:
+	var color := Color(BlueLineStyle.COLOR, 0.35)
+	for i in range(0, points.size() - 1, 3):
+		draw_line(points[i], points[i + 1], color, 1.0, true)
 
 
 ## Two arrows scaled by the mass ratio: long on whichever side will move.

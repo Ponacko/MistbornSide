@@ -53,6 +53,20 @@ func jump_speed() -> float:
 ## Pulling to an anchor closer than this makes Vin cling to it.
 @export var bracket_catch_distance := 14.0
 
+@export_group("Steelsight and forgiveness")
+@export var steelsight_time_scale := 0.15
+## Real seconds the slow window stays open (mouse, then gamepad).
+@export var steelsight_window := 0.25
+@export var steelsight_window_gamepad := 0.4
+@export var steelsight_ramp := 0.2
+## A release during Steelsight still Pushes for this long.
+@export var steelsight_tap_time := 0.12
+@export var push_buffer_frames := 6
+@export var arc_preview_time := 0.5
+## Pixels Vin is nudged sideways past a ceiling corner, or up over a ledge lip.
+@export var corner_correction := 6
+@export var ledge_correction := 6
+
 @export_group("Coins")
 @export var coin_pouch_size := 30
 @export var coin_flick_speed := 220.0
@@ -82,6 +96,7 @@ func jump_speed() -> float:
 @export var aim_snap_radius := 48.0
 ## Cursor distance forgiven per tenfold of mass over a clip.
 @export var aim_mass_weight := 4.0
+@export var aim_cycle_radius := 96.0
 ## Steepest angle from straight down that the falling heuristic accepts.
 @export var below_cone_degrees := 50.0
 

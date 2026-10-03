@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 
 Game="*res://scripts/core/game.gd"
 MetalRegistry="*res://scripts/allomancy/metal_registry.gd"
+TimeController="*res://scripts/core/time_controller.gd"
 
 [display]
 
