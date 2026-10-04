@@ -1,0 +1,60 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/allies/kelsier.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/allies/kelsier_marker.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/core/game_camera.gd" id="5"]
+
+[node name="KelsierMarkers" type="Node2D"]
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="Low" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(-200, 0)
+size = Vector2(500, 40)
+
+[node name="High" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(300, -90)
+size = Vector2(300, 130)
+
+[node name="Far" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(600, -90)
+size = Vector2(400, 130)
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="1_CoinJump" type="Node2D" parent="Markers"]
+script = ExtResource("4")
+position = Vector2(360, -91)
+action = 0
+move = 1
+trigger_radius = 90.0
+
+[node name="2_Vantage" type="Node2D" parent="Markers"]
+script = ExtResource("4")
+position = Vector2(700, -91)
+action = 1
+trigger_radius = 60.0
+
+[node name="3_Follow" type="Node2D" parent="Markers"]
+script = ExtResource("4")
+position = Vector2(950, -91)
+action = 2
+
+[node name="Kelsier" type="Node2D" parent="."]
+script = ExtResource("3")
+position = Vector2(150, -1)
+mode = 1
+markers_path = NodePath("../Markers")
+
+[node name="Vin" parent="." instance=ExtResource("2")]
+position = Vector2(0, -1)
+
+[node name="Camera" type="Camera2D" parent="."]
+process_callback = 0
+script = ExtResource("5")
+target_path = NodePath("../Vin")
