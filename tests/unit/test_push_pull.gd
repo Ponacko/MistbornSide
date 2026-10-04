@@ -62,11 +62,12 @@ func test_pull_brings_vin_to_a_bracket_across_a_gap() -> void:
 
 
 func test_dynamic_source_and_vin_move_by_mass_ratio() -> void:
-	var w := TestWorld.create(self, [FLOOR], Vector2(0, -1))
+	# In the air, with no footing to brace on, the sharing is pure momentum.
+	var w := TestWorld.create(self, [FLOOR], Vector2(0, -300))
 	var crate := RigidBody2D.new()
 	crate.mass = 45.0
 	crate.gravity_scale = 0.0
-	crate.position = Vector2(80, -30)
+	crate.position = Vector2(80, -330)
 	var shape := CollisionShape2D.new()
 	shape.shape = CircleShape2D.new()
 	crate.add_child(shape)

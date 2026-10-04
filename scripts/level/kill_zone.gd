@@ -11,7 +11,7 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	collision_layer = Layers.TRIGGER
-	collision_mask = Layers.PLAYER
+	collision_mask = Layers.PLAYER | Layers.ENEMY
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
 	rect.size = size
@@ -20,7 +20,9 @@ func _ready() -> void:
 	add_child(shape)
 	body_entered.connect(func(body):
 		if body is Vin:
-			Checkpoints.respawn.call_deferred(body))
+			Checkpoints.respawn.call_deferred(body)
+		elif body is Enemy:
+			(body as Enemy).die())
 
 
 func _draw() -> void:

@@ -170,6 +170,9 @@ func _apply_force(delta: float) -> void:
 	if hovering:
 		dv.x *= t.hover_lateral_mult
 		vin.velocity.x = ForceModel.hover_damp(t, vin.velocity.x, delta) if c.move.x == 0.0 else vin.velocity.x
+	if vin.is_on_floor() and absf(vin_dir.x) > 0.5 and locked.kind != MetalSource.Kind.ANCHORED:
+		var brace := t.brace_accel * (t.pewter_brace_mult if vin.pewter_on else 1.0) * delta
+		dv.x = move_toward(dv.x, 0.0, brace)
 	vin.velocity += dv
 	if mode == Mode.PULL and locked.kind == MetalSource.Kind.ANCHORED:
 		var along := vin.velocity.project(dir)
@@ -240,7 +243,7 @@ func _pouch_arriving_coins() -> void:
 			vin.pouch.pouch(s.body)
 
 
-func _valid(s: MetalSource) -> bool:
+func _valid(s: Variant) -> bool:
 	return is_instance_valid(s) and s.is_inside_tree() and s.is_targetable()
 
 

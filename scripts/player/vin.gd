@@ -9,7 +9,7 @@ signal hurt(hit: Hit)
 signal died
 signal crashed
 
-enum State { NORMAL, LEDGE_HANG, BRACKET_HANG, STAGGER }
+enum State { NORMAL, LEDGE_HANG, BRACKET_HANG, STAGGER, DODGE }
 
 const HALF_WIDTH := 6.0
 const STAND_HEIGHT := 44.0
@@ -44,6 +44,12 @@ var bronze_on := false
 ## Seconds of the pewter crash left: the stagger, then the slowdown.
 var crash_time_left := 0.0
 var invulnerable := false
+var combat: VinCombat
+## Atium widens the dodge window and makes counters auto-aim.
+var dodge_window_scale := 1.0
+var counter_aim := false
+## True while the current roll is a dash stab rather than a dodge.
+var roll_strikes := false
 ## How strongly the mists swirl toward Vin (0..1): rises while she burns
 ## metal, settles when she stops.
 var mist_strength := 0.0
@@ -71,6 +77,11 @@ var _cling_source: MetalSource
 var _stagger_left := 0.0
 var _stunned := false
 var _pewter := PewterBurn.new()
+var _roll_left := 0.0
+var _roll_dir := 1
+var _roll_speed := 0.0
+var _iframes := 0.0
+var _death_timer := 0.0
 
 
 func _ready() -> void:
@@ -92,6 +103,8 @@ func _ready() -> void:
 	add_child(pouch)
 	senses = TinSense.new(self)
 	add_child(senses)
+	combat = VinCombat.new(self)
+	add_child(combat)
 	# The mists are faintly luminescent: Vin is never a black hole in the night.
 	var glow := PointLight2D.new()
 	glow.name = "MistGlow"
@@ -116,7 +129,7 @@ func _ready() -> void:
 	overlay.vin = self
 	layer.add_child(overlay)
 	add_child(layer)
-	health.died.connect(func(): died.emit())
+	health.died.connect(_on_died)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -133,11 +146,21 @@ func _physics_process(delta: float) -> void:
 	_ledge_cooldown = maxf(_ledge_cooldown - delta, 0.0)
 	_wall_jump_lock = maxf(_wall_jump_lock - delta, 0.0)
 
+	if _death_timer > 0.0:
+		_death_timer -= delta
+		_stagger(delta, t)
+		if _death_timer <= 0.0:
+			Checkpoints.respawn(self)
+		if scripted:
+			controls.end_frame()
+		return
+	_iframes = maxf(_iframes - delta, 0.0)
 	_burn_toggles(delta, t)
 	senses.physics_update(delta)
 	if state != State.STAGGER:
 		pouch.physics_update(delta)
 		allomancy.physics_update(delta)
+	combat.physics_update(delta)
 	match state:
 		State.NORMAL:
 			_normal(delta, t)
@@ -147,6 +170,8 @@ func _physics_process(delta: float) -> void:
 			_bracket_hang()
 		State.STAGGER:
 			_stagger(delta, t)
+		State.DODGE:
+			_roll(delta, t)
 	_update_mist_pull(delta)
 	if wears_cloak:
 		var shoulders := global_position + (Vector2(0, -20) if crouching else SHOULDERS)
@@ -214,6 +239,8 @@ func respawn_at(at: Vector2) -> void:
 	state = State.NORMAL
 	_stagger_left = 0.0
 	_stunned = false
+	_death_timer = 0.0
+	_iframes = 0.0
 	crash_time_left = 0.0
 	crouching = false
 	_apply_shape()
@@ -223,10 +250,50 @@ func respawn_at(at: Vector2) -> void:
 	cloak.reset(global_position + SHOULDERS)
 
 
+func _on_died() -> void:
+	_death_timer = Game.tuning.death_respawn_delay
+	_enter_stagger(_death_timer)
+	died.emit()
+
+
+func is_dead() -> bool:
+	return _death_timer > 0.0 or health.is_dead()
+
+
+## Test and cutscene helper: pewter on or off without the toggle key.
+func toggle_pewter_now(on: bool) -> void:
+	pewter_on = on and reserves.has(MetalReserves.Metal.PEWTER)
+
+
+## A roll along the ground: the dodge (with invulnerability frames) or the
+## dash stab.
+func start_roll(dir: int, speed: float, time: float, iframes: float, strikes: bool) -> void:
+	state = State.DODGE
+	_roll_dir = dir
+	facing = dir
+	_roll_speed = speed
+	_roll_left = time
+	_iframes = iframes
+	roll_strikes = strikes
+	crouching = false
+	_apply_shape()
+
+
+func _roll(delta: float, t: Tuning) -> void:
+	_roll_left -= delta
+	velocity.x = _roll_dir * _roll_speed
+	velocity.y = minf(velocity.y + MovementMath.gravity(t, velocity.y, false) * delta, t.max_fall_speed)
+	move_and_slide()
+	if _roll_left <= 0.0:
+		state = State.NORMAL
+		roll_strikes = false
+		velocity.x = _roll_dir * t.run_speed * speed_scale
+
+
 ## A blow lands on Vin. Pewter halves damage (quarters flared) and shrugs off
 ## light hits without staggering.
 func take_hit(hit: Hit) -> bool:
-	if invulnerable or health.is_dead():
+	if invulnerable or _iframes > 0.0 or is_dead():
 		return false
 	var t := Game.tuning
 	var mult := 1.0
@@ -297,9 +364,13 @@ func _normal(delta: float, t: Tuning) -> void:
 	if input_x != 0.0:
 		facing = int(signf(input_x))
 	var top := (t.crouch_speed if crouching else t.run_speed) * speed_scale
+	if combat.swing_left > 0.0:
+		top *= 0.35
 	var forced := allomancy.force_active
-	# While a Push acts on her, ground friction does not eat the force.
-	velocity.x = MovementMath.horizontal(t, velocity.x, input_x, on_floor and not forced, delta, top)
+	# Ground friction does not eat a Push that drives her along the ground,
+	# but still brakes motion the force is not causing.
+	var driven := forced and absf(allomancy.force_dir.x) > 0.3 and signf(allomancy.force_dir.x) == signf(velocity.x)
+	velocity.x = MovementMath.horizontal(t, velocity.x, input_x, on_floor and not driven, delta, top)
 
 	if forced:
 		var g := ForceModel.push_gravity(t, velocity.y)

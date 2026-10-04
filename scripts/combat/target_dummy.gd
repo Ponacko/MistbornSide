@@ -16,6 +16,7 @@ func _ready() -> void:
 	shape.shape = rect
 	shape.position = Vector2(0, -20)
 	add_child(shape)
+	add_to_group("hittable")
 
 
 func take_hit(_hit: Hit) -> bool:

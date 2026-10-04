@@ -52,6 +52,11 @@ func jump_speed() -> float:
 ## scaled down and sideways speed damped, so balancing over an anchor is
 ## stable and steered with the move keys instead of flinging Vin off it.
 @export var hover_cone_degrees := 30.0
+## On the ground Vin braces against a sideways Push or Pull: this much of
+## the acceleration is absorbed by her footing, so a shove sends the guard
+## back and Vin only slides a little (pewter braces harder).
+@export var brace_accel := 1500.0
+@export var pewter_brace_mult := 1.6
 @export var hover_lateral_mult := 0.3
 ## Fastest a Push can make a light dynamic source (a coin) travel.
 @export var projectile_max_speed := 900.0
@@ -97,6 +102,35 @@ func jump_speed() -> float:
 @export var vision_radius := 260.0
 @export var tin_flash_stun := 1.0
 @export var tin_pulse_time := 0.6
+
+@export_group("Combat")
+@export var dagger_damage := 34.0
+## Reach of a dagger strike from Vin's centre, in pixels.
+@export var dagger_reach := 30.0
+@export var dagger_swing_time := 0.22
+@export var combo_window := 0.45
+@export var dash_speed := 300.0
+@export var dash_time := 0.22
+@export var dash_damage := 50.0
+@export var plunge_speed := 520.0
+@export var plunge_damage := 100.0
+## Hold the dagger this long with pewter on for the heavy strike.
+@export var heavy_hold_time := 0.3
+@export var heavy_damage := 70.0
+@export var dodge_time := 0.35
+@export var dodge_speed := 260.0
+@export var dodge_iframes := 0.25
+@export var dodge_cooldown := 0.4
+@export var death_respawn_delay := 1.0
+@export var guard_spear_damage := 34.0
+@export var guard_reach := 28.0
+@export var guard_windup := 0.4
+@export var guard_cooldown := 0.9
+@export var guard_contact_distance := 16.0
+## Pull impulse a guard's grip withstands before the spear is torn away.
+@export var guard_grip := 8000.0
+## Landing faster than this kills a guard (a fall from a roof).
+@export var fall_death_speed := 520.0
 
 @export_group("Coins")
 @export var coin_pouch_size := 30
