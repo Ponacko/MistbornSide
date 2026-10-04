@@ -27,6 +27,8 @@ var facing := 1
 var performing := false
 var silhouette := false
 var landed_blows := 0
+var sprite: CharacterSprite
+var _last_pos := Vector2.ZERO
 var _markers: Array[KelsierMarker] = []
 var _step := 0
 var _trail := PackedVector2Array()
@@ -40,6 +42,10 @@ var _advance_after := true
 
 func _ready() -> void:
 	add_to_group("allies")
+	sprite = CharacterSprite.new()
+	sprite.name = "Sprite"
+	sprite.who = "kelsier"
+	add_child(sprite)
 	if markers_path and has_node(markers_path):
 		for c in get_node(markers_path).get_children():
 			if c is KelsierMarker:
@@ -104,7 +110,6 @@ func _physics_process(delta: float) -> void:
 					_next_step()
 	elif mode == Mode.COMPANION:
 		_companion(delta, v)
-	queue_redraw()
 
 
 func face_toward(x: float) -> void:
@@ -217,19 +222,19 @@ func _fight(delta: float, e: Enemy) -> void:
 			landed_blows += 1
 
 
-func _draw() -> void:
-	var body := Color(0.22, 0.22, 0.26)
-	var skin := Color(0.85, 0.72, 0.6)
-	var hair := Color(0.85, 0.75, 0.45)
-	if silhouette:
-		body = Color(0.08, 0.09, 0.12, 0.85)
-		skin = body
-		hair = body
-	draw_rect(Rect2(-6, -HEIGHT + 10, 12, HEIGHT - 10), body)
-	draw_rect(Rect2(-5, -HEIGHT, 10, 10), skin)
-	draw_rect(Rect2(-5, -HEIGHT, 10, 3), hair)
-	if not silhouette:
-		draw_rect(Rect2(facing * 2.0 - 1.0, -HEIGHT + 5, 2, 2), Color.BLACK)
-	# Cloak tassels.
-	for i in 4:
-		draw_line(Vector2(-facing * 4.0 + i - 2, -HEIGHT + 12), Vector2(-facing * 9.0 + i * 2 - 3, -8), Color(body, 0.8), 1.0)
+func _process(_delta: float) -> void:
+	if sprite == null:
+		return
+	var state := "idle"
+	var moved := global_position.distance_to(_last_pos)
+	_last_pos = global_position
+	if performing:
+		state = "leap" if _move_marker and _move_marker.move != KelsierMarker.Move.WALK else "run"
+	elif _shove_cd > SHOVE_INTERVAL - 0.25:
+		state = "shove"
+	elif _strike_cd > STRIKE_INTERVAL - 0.2:
+		state = "attack"
+	elif moved > 0.5:
+		state = "run"
+	sprite.show_state(state, facing)
+	sprite.modulate = Color(0.12, 0.13, 0.18, 0.9) if silhouette else Color.WHITE

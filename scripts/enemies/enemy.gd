@@ -38,6 +38,7 @@ var misting_label := ""
 var desired_speed := 0.0
 var last_hit_kind := -1
 var home := Vector2.ZERO
+var sprite: CharacterSprite
 var _stagger := 0.0
 var _dead := false
 ## Shoved off his feet: no footing to resist with for a moment.
@@ -61,6 +62,11 @@ func _ready() -> void:
 	if misting_label != "":
 		add_to_group("allomancers")
 	suspicion.stage_changed.connect(_on_stage_changed)
+	if art_who() != "":
+		sprite = CharacterSprite.new()
+		sprite.name = "Sprite"
+		sprite.who = art_who()
+		add_child(sprite)
 	NoiseBus.noise.connect(_on_noise)
 
 
@@ -260,6 +266,30 @@ func winding_up() -> bool:
 
 func _will_strike(_seconds: float) -> bool:
 	return false
+
+
+## Which CharacterArt figure draws this enemy ("" for none).
+func art_who() -> String:
+	return ""
+
+
+## The animation state to show this frame.
+func art_state() -> String:
+	if _dead:
+		return "dead"
+	if _stagger > 0.0:
+		return "stagger"
+	return "walk" if absf(velocity.x) > 5.0 else "idle"
+
+
+func _process(_delta: float) -> void:
+	if sprite:
+		sprite.who = art_who()
+		sprite.show_state(art_state(), facing)
+
+
+func _draw() -> void:
+	_draw_suspicion()
 
 
 ## The suspicion icon over the head: ? suspicious, ! alerted.

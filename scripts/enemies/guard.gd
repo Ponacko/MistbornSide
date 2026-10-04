@@ -156,16 +156,14 @@ func on_death() -> void:
 		get_parent().add_child.call_deferred(loose)
 
 
-func _draw() -> void:
-	if dead():
-		draw_rect(Rect2(-22, -10, 44, 10), Color(0.28, 0.22, 0.2))
-		return
-	draw_rect(Rect2(-HALF_WIDTH, -HEIGHT, HALF_WIDTH * 2.0, HEIGHT), Color(0.36, 0.3, 0.27))
-	draw_rect(Rect2(-HALF_WIDTH + 1, -HEIGHT, HALF_WIDTH * 2.0 - 2, 9), Color(0.8, 0.66, 0.55))
-	if armoured:
-		draw_rect(Rect2(-HALF_WIDTH, -34, HALF_WIDTH * 2.0, 12), Color(0.55, 0.58, 0.62))
-	if has_spear:
-		var tip := Vector2(facing * (24.0 if _windup <= 0.0 else 14.0), -26)
-		draw_line(Vector2(-facing * 10.0, -24), tip, Color(0.45, 0.33, 0.22), 2.0)
-		draw_line(tip, tip + Vector2(facing * 4.0, 0), Color(0.7, 0.72, 0.76), 2.0)
-	_draw_suspicion()
+func art_who() -> String:
+	return "guard" + ("" if armoured else "_bare") + ("" if has_spear else "_unarmed")
+
+
+func art_state() -> String:
+	if not dead() and _stagger <= 0.0:
+		if _windup > 0.0:
+			return "windup"
+		if _cooldown > Game.tuning.guard_cooldown - 0.2:
+			return "strike"
+	return super.art_state()

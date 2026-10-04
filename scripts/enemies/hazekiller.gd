@@ -94,14 +94,14 @@ func on_death() -> void:
 		squad.release_attack_token(self)
 
 
-func _draw() -> void:
-	if dead():
-		draw_rect(Rect2(-20, -8, 40, 8), Color(0.3, 0.26, 0.2))
-		return
-	draw_rect(Rect2(-HALF_WIDTH, -HEIGHT, HALF_WIDTH * 2.0, HEIGHT), Color(0.24, 0.22, 0.2))
-	draw_rect(Rect2(-HALF_WIDTH + 1, -HEIGHT, HALF_WIDTH * 2.0 - 2, 9), Color(0.75, 0.6, 0.5))
-	var staff_tip := Vector2(facing * (26.0 if _windup <= 0.0 else 12.0), -30)
-	draw_line(Vector2(-facing * 8.0, -20), staff_tip, Color(0.5, 0.38, 0.24), 2.0)
-	if has_shield:
-		draw_rect(Rect2(facing * 6.0 - 2.0, -36, 5, 22), Color(0.55, 0.4, 0.25))
-	_draw_suspicion()
+func art_who() -> String:
+	return "hazekiller" if has_shield else "hazekiller_noshield"
+
+
+func art_state() -> String:
+	if not dead() and _stagger <= 0.0:
+		if _windup > 0.0:
+			return "windup"
+		if _cooldown > Game.tuning.hazekiller_cooldown - 0.2:
+			return "strike"
+	return super.art_state()

@@ -30,14 +30,11 @@ func think(delta: float) -> void:
 			_patrol()
 
 
-func _draw() -> void:
-	if dead():
-		draw_rect(Rect2(-20, -8, 40, 8), Color(0.35, 0.35, 0.37))
-		return
-	var robe := Color(0.45, 0.45, 0.48)
-	draw_rect(Rect2(-HALF_WIDTH, -HEIGHT + 9, HALF_WIDTH * 2.0, HEIGHT - 9), robe)
-	draw_rect(Rect2(-HALF_WIDTH + 1, -HEIGHT, HALF_WIDTH * 2.0 - 2, 9), Color(0.82, 0.7, 0.6))
-	# Eye tattoos.
-	draw_line(Vector2(facing * 1.0, -HEIGHT + 3), Vector2(facing * 5.0, -HEIGHT + 2), Color(0.2, 0.25, 0.4), 1.0)
-	draw_line(Vector2(facing * 1.0, -HEIGHT + 5), Vector2(facing * 5.0, -HEIGHT + 6), Color(0.2, 0.25, 0.4), 1.0)
-	_draw_suspicion()
+func art_who() -> String:
+	return "obligator"
+
+
+func art_state() -> String:
+	if not dead() and _stagger <= 0.0 and aware:
+		return "alarm"
+	return super.art_state()

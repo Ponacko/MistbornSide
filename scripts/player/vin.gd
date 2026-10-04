@@ -28,6 +28,7 @@ var allomancy: Allomancer
 var pouch: CoinPouch
 var senses: TinSense
 var cloak: Mistcloak
+var sprite: CharacterSprite
 ## Vin wears the mistcloak; Valette's gowns turn it off (DESIGN.md 4).
 var wears_cloak := true:
 	set(value):
@@ -144,6 +145,10 @@ func _ready() -> void:
 	layer.add_child(overlay)
 	add_child(layer)
 	health.died.connect(_on_died)
+	sprite = CharacterSprite.new()
+	sprite.name = "Sprite"
+	sprite.who = "vin"
+	add_child(sprite)
 	landed.connect(_on_landed)
 
 
@@ -207,8 +212,8 @@ func _physics_process(delta: float) -> void:
 			_roll(delta, t)
 	_update_mist_pull(delta)
 	if wears_cloak:
-		var shoulders := global_position + (Vector2(0, -20) if crouching else SHOULDERS)
-		cloak.step(delta, shoulders, velocity, facing)
+		sprite.show_state(art_state(), facing)
+		cloak.step(delta, cloak_anchor(), velocity, facing)
 	if scripted:
 		controls.end_frame()
 
@@ -629,14 +634,39 @@ func _bracket_hang() -> void:
 		state = State.NORMAL
 
 
+## The animation state CharacterArt draws this frame.
+func art_state() -> String:
+	if is_dead():
+		return "dead"
+	match state:
+		State.STAGGER:
+			return "stagger"
+		State.DODGE:
+			return "dash" if roll_strikes else "dodge"
+		State.LEDGE_HANG:
+			return "ledge_hang"
+		State.BRACKET_HANG:
+			return "bracket_hang"
+	if combat.plunging:
+		return "plunge"
+	if combat.swing_left > 0.0:
+		return "attack" if combat.combo_step > 0 else "heavy"
+	if crouching:
+		return "crouch"
+	if allomancy.force_active:
+		return "push" if allomancy.mode == Allomancer.Mode.PUSH else "pull"
+	if not is_on_floor():
+		if is_on_wall() and velocity.y > 0.0 and controls.move.x != 0.0:
+			return "wall_slide"
+		return "jump" if velocity.y < 0.0 else "fall"
+	return "run" if absf(velocity.x) > 10.0 else "idle"
+
+
+## Where the mistcloak hangs from in the current pose, in world space.
+func cloak_anchor() -> Vector2:
+	var s := CharacterArt.shoulder("vin", sprite.state, sprite.frame_index)
+	return global_position + Vector2(s.x * facing, s.y)
+
+
 func _process(_delta: float) -> void:
-	queue_redraw()
-
-
-## Placeholder art until the character art pass.
-func _draw() -> void:
-	var h := CROUCH_HEIGHT if crouching else STAND_HEIGHT
-	draw_rect(Rect2(-HALF_WIDTH, -h, HALF_WIDTH * 2.0, h), Color(0.3, 0.29, 0.34))
-	draw_rect(Rect2(-HALF_WIDTH + 1, -h, HALF_WIDTH * 2.0 - 2, 10), Color(0.85, 0.72, 0.62))
-	draw_rect(Rect2(-HALF_WIDTH, -h, HALF_WIDTH * 2.0, 4), Color(0.05, 0.05, 0.06))
-	draw_rect(Rect2(facing * 2.0 - 1.0, -h + 5, 2, 2), Color.BLACK)
+	sprite.show_state(art_state(), facing)

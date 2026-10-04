@@ -107,7 +107,8 @@ func _physics_process(delta: float) -> void:
 			_timer -= delta
 			if _timer <= 0.0:
 				phase = Phase.PURSUING
-	queue_redraw()
+	if sprite:
+		sprite.show_state(art_state(), facing)
 
 
 func _pursue(delta: float, v: Vin, t: Tuning) -> void:
@@ -253,14 +254,20 @@ func receive_push(impulse: Vector2, _source: MetalSource) -> Vector2:
 	return impulse
 
 
+func art_who() -> String:
+	return "inquisitor"
+
+
+func art_state() -> String:
+	match phase:
+		Phase.ATTACKING:
+			return "windup" if _timer > 0.08 else "strike"
+		Phase.RECOVERING:
+			return "recover"
+		Phase.PURSUING:
+			return "idle" if hold_ground else "run"
+	return "idle"
+
+
 func _draw() -> void:
-	var robe := Color(0.12, 0.1, 0.12)
-	draw_rect(Rect2(-HALF_WIDTH - 1, -HEIGHT - 4, HALF_WIDTH * 2.0 + 2, HEIGHT + 4), robe)
-	draw_rect(Rect2(-HALF_WIDTH + 1, -HEIGHT - 4, HALF_WIDTH * 2.0 - 2, 9), Color(0.78, 0.7, 0.66))
-	draw_rect(Rect2(facing * 2.0 - 1.5, -HEIGHT + 0, 3, 3), Color(0.55, 0.58, 0.62))
-	for x in [-3.0, 3.0]:
-		draw_line(Vector2(x, -HEIGHT - 4), Vector2(x - facing * 4.0, -HEIGHT - 9), Color(0.6, 0.62, 0.66), 1.0)
-	var swing := phase == Phase.ATTACKING
-	var head := Vector2(facing * (24.0 if not swing else 10.0), -34 if not swing else -46)
-	draw_line(Vector2(0, -26), head, Color(0.35, 0.28, 0.2), 2.0)
-	draw_rect(Rect2(head + Vector2(-3, -4), Vector2(6, 8)), Color(0.08, 0.08, 0.1))
+	pass
