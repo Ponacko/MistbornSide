@@ -6,6 +6,7 @@ extends Camera2D
 @export var look_ahead := 0.18
 
 var target: Node2D
+var _shake := 0.0
 
 
 func _ready() -> void:
@@ -14,6 +15,9 @@ func _ready() -> void:
 	if target_path:
 		target = get_node(target_path)
 	make_current()
+	if target is Vin:
+		(target as Vin).hurt.connect(func(_h): shake(3.0))
+		(target as Vin).allomancy.launched.connect(func(): shake(1.5))
 
 
 func _physics_process(_delta: float) -> void:
@@ -25,3 +29,10 @@ func _physics_process(_delta: float) -> void:
 	if target is CharacterBody2D:
 		v = (target as CharacterBody2D).velocity
 	global_position = target.global_position + Vector2(0, -40) + Vector2(v.x, v.y * 0.5) * look_ahead
+	_shake = move_toward(_shake, 0.0, _delta * 12.0)
+	offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _shake * Settings.screen_shake
+
+
+## A jolt of screen shake (hits, launches), scaled by the comfort setting.
+func shake(amount: float) -> void:
+	_shake = maxf(_shake, amount)

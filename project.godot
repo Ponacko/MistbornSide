@@ -12,7 +12,7 @@ config_version=5
 
 config/name="MistbornSide"
 config/description="An unofficial, non-commercial Mistborn fan game."
-run/main_scene="res://levels/greybox/greybox.tscn"
+run/main_scene="res://scenes/ui/title.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -28,6 +28,8 @@ Checkpoints="*res://scripts/level/checkpoints.gd"
 CourseClock="*res://scripts/level/course_clock.gd"
 StoryFlags="*res://scripts/story/story_flags.gd"
 Audio="*res://scripts/audio/audio.gd"
+SaveGame="*res://scripts/core/save_game.gd"
+GameFlow="*res://scripts/core/game_flow.gd"
 
 [display]
 

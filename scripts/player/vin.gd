@@ -378,6 +378,8 @@ func take_hit(hit: Hit) -> bool:
 		mult = t.pewter_flare_damage
 	elif pewter_on:
 		mult = t.pewter_damage
+	if Settings.assist_mode:
+		mult *= 0.5
 	health.damage(hit.damage * mult)
 	if wounded:
 		wound_hits += 1

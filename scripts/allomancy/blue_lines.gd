@@ -36,9 +36,8 @@ func _draw() -> void:
 		if is_target:
 			a = maxf(a, 0.8) * 1.15
 			w = w * 1.6 + 0.6
-		var color := BlueLineStyle.COLOR
-		color.a = clampf(a, 0.0, 1.0)
-		draw_line(chest, to, color, w, true)
+		var color := line_color(a)
+		draw_line(chest, to, color, w * width_scale(), true)
 		if is_target:
 			_glyph(to, color)
 			_preview_arrows(chest, to, line.source)
@@ -70,6 +69,20 @@ func _arrow(from: Vector2, dir: Vector2, length: float) -> void:
 	draw_line(from, tip, color, 1.0, true)
 	draw_line(tip, tip - dir.rotated(0.5) * 4.0, color, 1.0, true)
 	draw_line(tip, tip - dir.rotated(-0.5) * 4.0, color, 1.0, true)
+
+
+## Line colour for an alpha, honouring the palette and high-contrast option.
+static func line_color(alpha: float) -> Color:
+	var c := Settings.palette_color(&"lines")
+	if Settings.high_contrast_lines:
+		c = c.lightened(0.35)
+		alpha = clampf(alpha * 1.6 + 0.25, 0.0, 1.0)
+	c.a = clampf(alpha, 0.0, 1.0)
+	return c
+
+
+static func width_scale() -> float:
+	return Settings.line_thickness
 
 
 func _glyph(at: Vector2, color: Color) -> void:

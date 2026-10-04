@@ -47,7 +47,7 @@ func _init(owner_vin: Vin) -> void:
 
 ## True while Vin has steel or iron to burn. Lines show only then.
 func sees_lines() -> bool:
-	return vin.reserves.has(MetalReserves.Metal.STEEL) or vin.reserves.has(MetalReserves.Metal.IRON)
+	return Settings.lines_always or vin.reserves.has(MetalReserves.Metal.STEEL) or vin.reserves.has(MetalReserves.Metal.IRON)
 
 
 func physics_update(delta: float) -> void:
@@ -83,7 +83,13 @@ func _update_lines_and_target() -> void:
 		if s.is_targetable():
 			_candidates.append({"source": s, "pos": pos, "mass": s.mass, "kind": s.kind, "id": id})
 	var ctx := _context()
-	var picked := TargetScorer.pick(_candidates, ctx)
+	var picked := {}
+	if ctx.aim_active or Settings.auto_target:
+		picked = TargetScorer.pick(_candidates, ctx)
+	if picked.is_empty() and Settings.sticky_target and _valid(_last_target):
+		for c in _candidates:
+			if c.source == _last_target:
+				picked = c
 	_update_cycle(ctx, picked)
 	if target != _last_target and target != null:
 		target_locked.emit(target)

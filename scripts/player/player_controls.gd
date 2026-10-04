@@ -60,6 +60,8 @@ func read_device(owner: Node2D, delta: float) -> void:
 	push_held = Input.is_action_pressed("push")
 	pull_pressed = Input.is_action_just_pressed("pull")
 	pull_held = Input.is_action_pressed("pull")
+	if Settings.toggle_push:
+		apply_toggle_mode(push_pressed, Input.is_action_just_pressed("push"), pull_pressed, Input.is_action_just_pressed("pull"))
 	# Clicks on a debug or menu panel are not Pushes.
 	if owner.get_viewport().gui_get_hovered_control() != null:
 		push_pressed = false
@@ -135,6 +137,25 @@ const PRESS_ACTIONS := ["jump", "push", "pull", "coin", "dagger", "dodge", "togg
 	"toggle_copper", "toggle_bronze", "flare", "interact"]
 var _last_pressed := {}
 var _last_frame := -1
+
+
+var _push_latched := false
+var _pull_latched := false
+
+
+## Toggle mode (DESIGN.md 7.3): a tap latches Push or Pull on, another tap
+## releases it.
+func apply_toggle_mode(push_tap: bool, _push_down: bool, pull_tap: bool, _pull_down: bool) -> void:
+	if push_tap:
+		_push_latched = not _push_latched
+		_pull_latched = false
+	if pull_tap:
+		_pull_latched = not _pull_latched
+		_push_latched = false
+	push_held = _push_latched
+	pull_held = _pull_latched
+	push_pressed = push_tap and _push_latched
+	pull_pressed = pull_tap and _pull_latched
 
 
 ## Whether the named input action was pressed this frame (scripted mode),
