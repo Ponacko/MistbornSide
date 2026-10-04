@@ -200,19 +200,6 @@ aim_down={
 ])
 }
 
-[physics]
-
-common/physics_interpolation=true
-
-[rendering]
-
-environment/defaults/default_clear_color=Color(0.03, 0.035, 0.05, 1)
-
-textures/canvas_textures/default_texture_filter=0
-rendering_device/driver.windows="d3d12"
-2d/snap/snap_2d_transforms_to_pixel=true
-2d/snap/snap_2d_vertices_to_pixel=true
-
 [layer_names]
 
 2d_physics/layer_1="world"
@@ -221,3 +208,17 @@ rendering_device/driver.windows="d3d12"
 2d_physics/layer_4="metal"
 2d_physics/layer_5="trigger"
 2d_physics/layer_6="shield"
+
+[physics]
+
+common/physics_interpolation=true
+
+[rendering]
+
+viewport/hdr_2d=true
+
+textures/canvas_textures/default_texture_filter=0
+rendering_device/driver.windows="d3d12"
+environment/defaults/default_clear_color=Color(0.03, 0.035, 0.05, 1)
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_2d_vertices_to_pixel=true

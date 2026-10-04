@@ -179,8 +179,11 @@ func _enforce_budget() -> void:
 
 func _draw() -> void:
 	var c := Color(0.8, 0.55, 0.35)
+	# A glint over white: coins catch the light and bloom a little.
+	var glint := Color(1.3, 1.1, 0.8)
 	if count == 1:
 		draw_rect(Rect2(-1.5, -1, 3, 2), c)
+		draw_rect(Rect2(-1, -1, 1, 1), glint)
 	else:
 		for i in mini(count, 4):
 			draw_rect(Rect2(-2 + (i % 2), 0 - i, 4, 1), c.darkened(0.1 * (i % 2)))

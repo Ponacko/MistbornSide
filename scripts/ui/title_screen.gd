@@ -6,6 +6,7 @@ extends CanvasLayer
 var _root: Control
 var _menu: VBoxContainer
 var _buttons := {}
+var _camera: Camera2D
 
 
 func _ready() -> void:
@@ -14,12 +15,29 @@ func _ready() -> void:
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.theme = UiKit.theme()
 	add_child(_root)
-	var bg := ColorRect.new()
-	bg.color = Color(0.02, 0.025, 0.04)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(bg)
+	# Luthadel at night behind the menu: the skyline, ash, and a slow camera drift.
+	var world := Node2D.new()
+	add_child(world)
+	var sky := CitySkyline.new()
+	sky.horizon_y = 200.0
+	sky.seed_value = 2
+	world.add_child(sky)
+	world.add_child(AshFall.new())
+	_camera = Camera2D.new()
+	_camera.position = Vector2(0, -60)
+	world.add_child(_camera)
+	_camera.make_current()
+	var dim := ColorRect.new()
+	dim.color = Color(0.0, 0.0, 0.0, 0.35)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.add_child(dim)
 	_main_menu()
 	Audio.play_music("night_city")
+
+
+func _process(delta: float) -> void:
+	if _camera:
+		_camera.position.x += 6.0 * delta
 
 
 func has_button(text: String) -> bool:

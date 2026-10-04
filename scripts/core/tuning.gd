@@ -99,7 +99,7 @@ func jump_speed() -> float:
 @export var light_hit_stagger := 0.35
 @export var heavy_hit_stagger := 0.6
 ## How far Vin sees in the mists without tin; tin triples it.
-@export var vision_radius := 260.0
+@export var vision_radius := 300.0
 @export var tin_flash_stun := 1.0
 @export var tin_pulse_time := 0.6
 

@@ -126,7 +126,8 @@ func _ready() -> void:
 	glow.texture = Lantern._light_texture()
 	glow.texture_scale = 0.9
 	glow.color = Color(0.62, 0.68, 0.85)
-	glow.energy = 0.9
+	glow.energy = 1.6
+	glow.height = 60.0
 	glow.position = CHEST
 	add_child(glow)
 	cloak = Mistcloak.new()

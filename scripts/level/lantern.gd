@@ -4,11 +4,11 @@ extends Node2D
 ## A warm lantern: a 2D light, a metal housing (it can be Pushed), and a
 ## pool of light that exposes Vin to guards (DESIGN.md 6.4).
 
-@export var radius := 110.0:
+@export var radius := 130.0:
 	set(value):
 		radius = value
 		_update_light()
-@export var energy := 1.3
+@export var energy := 4.5
 @export var color := Color(1.0, 0.66, 0.32)
 ## Lanterns hang from metal; the housing is a metal source.
 @export var metal := true
@@ -33,7 +33,15 @@ func _ready() -> void:
 	light.texture = _light_texture()
 	light.color = color
 	light.energy = energy
-	light.shadow_enabled = false
+	# Normal-mapped walls face the camera; the light must sit in front of
+	# them (height) or it only grazes them.
+	light.height = 90.0
+	light.shadow_enabled = true
+	light.shadow_filter = Light2D.SHADOW_FILTER_PCF5
+	light.shadow_filter_smooth = 2.0
+	light.shadow_color = Color(0, 0, 0, 0.55)
+	# Warmest at the core: the gradient's inner stop drives the pool's heart.
+	light.blend_mode = Light2D.BLEND_MODE_ADD
 	add_child(light)
 	_update_light()
 	if Engine.is_editor_hint():
@@ -89,12 +97,33 @@ static func _light_texture() -> GradientTexture2D:
 		var g := Gradient.new()
 		g.set_color(0, Color(1, 1, 1, 1))
 		g.set_color(1, Color(1, 1, 1, 0))
-		g.add_point(0.4, Color(1, 1, 1, 0.45))
+		g.add_point(0.25, Color(1, 1, 1, 0.7))
+		g.add_point(0.55, Color(1, 1, 1, 0.3))
 		_texture.gradient = g
 	return _texture
 
 
+func _process(_delta: float) -> void:
+	if light and not Engine.is_editor_hint():
+		# A candle's slow flicker.
+		var t := Time.get_ticks_msec() / 1000.0
+		var flicker := 0.92 + 0.08 * sin(t * 7.3 + position.x) * sin(t * 3.1 + position.y)
+		light.energy = (energy + _flash_glow * 3.0) * flicker
+		queue_redraw()
+
+
 func _draw() -> void:
-	draw_rect(Rect2(-3, -5, 6, 8), Color(0.2, 0.18, 0.16))
-	draw_rect(Rect2(-2, -4, 4, 5), Color(1.0, 0.8, 0.45))
-	draw_line(Vector2(0, -5), Vector2(0, -10), Color(0.3, 0.3, 0.32), 1.0)
+	var iron := Color(0.18, 0.17, 0.17)
+	# Bracket and chain.
+	draw_line(Vector2(0, -6), Vector2(0, -14), iron, 1.0)
+	draw_rect(Rect2(-1, -15, 2, 2), iron)
+	# Housing: a small glass box with an iron cap and base.
+	draw_rect(Rect2(-4, -6, 8, 2), iron)
+	draw_rect(Rect2(-3, -4, 6, 7), Color(1.0, 0.75, 0.4, 0.55))
+	draw_rect(Rect2(-4, 3, 8, 2), iron)
+	draw_line(Vector2(-3, -4), Vector2(-3, 3), iron, 1.0)
+	draw_line(Vector2(3, -4), Vector2(3, 3), iron, 1.0)
+	# The flame itself, above white so it blooms.
+	var glow := 1.4 + _flash_glow * 3.0
+	draw_rect(Rect2(-1, -2, 2, 3), Color(1.0, 0.85, 0.5) * glow)
+	draw_rect(Rect2(-2, -1, 4, 2), Color(1.0, 0.65, 0.3, 0.8) * glow)

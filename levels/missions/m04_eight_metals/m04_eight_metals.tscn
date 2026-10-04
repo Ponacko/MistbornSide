@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
@@ -23,18 +23,18 @@
 [ext_resource type="Script" path="res://scripts/allomancy/coin.gd" id="21"]
 [ext_resource type="Script" path="res://scripts/audio/music_zone.gd" id="22"]
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="23"]
+[ext_resource type="Script" path="res://scripts/fx/city_skyline.gd" id="24"]
+[ext_resource type="Script" path="res://scripts/level/facade.gd" id="25"]
 
 [node name="EightMetals" type="Node2D"]
 script = ExtResource("17")
 mission_id = "04"
 title = "Eight Metals"
 
-[node name="CityBackdrop" type="Node2D" parent="."]
-script = ExtResource("7")
-position = Vector2(-60, -760)
-size = Vector2(3080, 760)
-style = 2
-color = Color(0.42, 0.42, 0.48, 1)
+[node name="Skyline" type="CanvasLayer" parent="."]
+script = ExtResource("24")
+horizon_y = 90.0
+seed_value = 4
 
 [node name="ShopBack" type="Node2D" parent="."]
 script = ExtResource("7")
@@ -42,6 +42,15 @@ position = Vector2(0, -100)
 size = Vector2(240, 100)
 style = 4
 color = Color(0.9, 0.85, 0.8, 1)
+
+[node name="WallFront" type="Node2D" parent="."]
+position = Vector2(2650, -540)
+script = ExtResource("25")
+size = Vector2(300, 620)
+kind = 3
+style = 3
+tint = Color(0.45, 0.45, 0.5, 1)
+seed_value = 7
 
 [node name="Geometry" type="Node2D" parent="."]
 

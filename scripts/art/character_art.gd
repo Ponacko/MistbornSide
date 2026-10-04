@@ -295,8 +295,48 @@ class _Canvas:
 				if Geometry2D.is_point_in_polygon(Vector2(x, y), points):
 					px(Vector2(x, y), c)
 
+	## A one-pixel dark outline around the figure, the pixel-art trick that
+	## keeps a small sprite legible against mist and shadow.
+	func outline() -> void:
+		var w := CharacterArt.W
+		var h := CharacterArt.H
+		var edge := Color(0.03, 0.03, 0.04, 1.0)
+		var src := color.duplicate()
+		for y in h:
+			for x in w:
+				if src.get_pixel(x, y).a > 0.5:
+					continue
+				var touching := false
+				for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var q := Vector2i(x, y) + d
+					if q.x >= 0 and q.y >= 0 and q.x < w and q.y < h and src.get_pixel(q.x, q.y).a > 0.5:
+						touching = true
+						break
+				if touching:
+					color.set_pixel(x, y, edge)
+
+	## Simple two-tone shading: pixels on the lit (facing) side a touch
+	## lighter, the far side a touch darker.
+	func shade() -> void:
+		var w := CharacterArt.W
+		var h := CharacterArt.H
+		for y in h:
+			for x in w:
+				var c := color.get_pixel(x, y)
+				if c.a < 0.5 or metal.get_pixel(x, y).r > 0.5:
+					continue
+				var right := x + 1 < w and color.get_pixel(x + 1, y).a > 0.5
+				var left := x > 0 and color.get_pixel(x - 1, y).a > 0.5
+				var up := y > 0 and color.get_pixel(x, y - 1).a > 0.5
+				if not right or not up:
+					color.set_pixel(x, y, c.lightened(0.18))
+				elif not left:
+					color.set_pixel(x, y, c.darkened(0.22))
+
 	## Normal map from a rounded height field: higher away from the edges.
 	func finish() -> CanvasTexture:
+		shade()
+		outline()
 		var w := CharacterArt.W
 		var h := CharacterArt.H
 		var height := PackedFloat32Array()

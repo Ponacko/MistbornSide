@@ -37,6 +37,9 @@ func _draw() -> void:
 			a = maxf(a, 0.8) * 1.15
 			w = w * 1.6 + 0.6
 		var color := line_color(a)
+		if is_target:
+			# Over white in HDR: the target line blooms.
+			color = Color(color.r * 1.5, color.g * 1.5, color.b * 1.6, color.a)
 		draw_line(chest, to, color, w * width_scale(), true)
 		if is_target:
 			_glyph(to, color)

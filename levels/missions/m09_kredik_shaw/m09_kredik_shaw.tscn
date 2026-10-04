@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
@@ -28,32 +28,48 @@
 [ext_resource type="Script" path="res://scripts/allomancy/coin.gd" id="26"]
 [ext_resource type="Script" path="res://scripts/audio/music_zone.gd" id="27"]
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="28"]
+[ext_resource type="Script" path="res://scripts/fx/city_skyline.gd" id="29"]
+[ext_resource type="Script" path="res://scripts/level/facade.gd" id="30"]
 
 [node name="KredikShaw" type="Node2D"]
 script = ExtResource("17")
 mission_id = "09"
 title = "Kredik Shaw"
 
-[node name="SpireBackdrop" type="Node2D" parent="."]
-script = ExtResource("7")
-position = Vector2(-140, -900)
-size = Vector2(1260, 900)
-style = 3
-color = Color(0.45, 0.45, 0.52, 1)
+[node name="Skyline" type="CanvasLayer" parent="."]
+script = ExtResource("29")
+horizon_y = 90.0
+seed_value = 9
+kredik_shaw = false
 
-[node name="HallBackdrop" type="Node2D" parent="."]
-script = ExtResource("7")
-position = Vector2(1100, -300)
-size = Vector2(850, 130)
+[node name="SpireWall" type="Node2D" parent="."]
+position = Vector2(-140, -900)
+script = ExtResource("30")
+size = Vector2(1260, 900)
+kind = 3
 style = 3
-color = Color(0.75, 0.75, 0.8, 1)
+tint = Color(0.42, 0.42, 0.5, 1)
+seed_value = 3
+window_top = 700.0
+
+[node name="HallFront" type="Node2D" parent="."]
+position = Vector2(1100, -300)
+script = ExtResource("30")
+size = Vector2(850, 130)
+kind = 1
+style = 3
+tint = Color(0.62, 0.62, 0.7, 1)
+seed_value = 5
+window_top = 14.0
 
 [node name="DomeBackdrop" type="Node2D" parent="."]
-script = ExtResource("7")
 position = Vector2(1950, -420)
+script = ExtResource("30")
 size = Vector2(450, 250)
+kind = 4
 style = 4
-color = Color(0.85, 0.7, 0.55, 1)
+tint = Color(0.72, 0.6, 0.5, 1)
+seed_value = 12
 
 [node name="HutBackdrop" type="Node2D" parent="."]
 script = ExtResource("7")
@@ -61,13 +77,6 @@ position = Vector2(2050, -230)
 size = Vector2(80, 60)
 style = 5
 color = Color(0.9, 0.8, 0.7, 1)
-
-[node name="CityBackdrop" type="Node2D" parent="."]
-script = ExtResource("7")
-position = Vector2(2400, -700)
-size = Vector2(2060, 700)
-style = 2
-color = Color(0.4, 0.4, 0.46, 1)
 
 [node name="Geometry" type="Node2D" parent="."]
 

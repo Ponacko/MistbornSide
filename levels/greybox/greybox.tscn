@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3]
+[gd_scene load_steps=25 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
@@ -23,20 +23,19 @@
 [ext_resource type="Script" path="res://scripts/ui/tuning_panel.gd" id="21"]
 [ext_resource type="Script" path="res://scripts/audio/music_zone.gd" id="22"]
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="23"]
+[ext_resource type="Script" path="res://scripts/fx/city_skyline.gd" id="24"]
 
 [node name="Greybox" type="Node2D"]
+
+[node name="Skyline" type="CanvasLayer" parent="."]
+script = ExtResource("24")
+horizon_y = 90.0
 
 [node name="YardBackdrop" type="Node2D" parent="."]
 script = ExtResource("13")
 position = Vector2(-1820, -420)
 size = Vector2(1820, 420)
 color = Color(0.16, 0.16, 0.19, 1)
-
-[node name="CityBackdrop" type="Node2D" parent="."]
-script = ExtResource("13")
-position = Vector2(0, -1000)
-size = Vector2(3000, 1060)
-color = Color(0.13, 0.13, 0.16, 1)
 
 [node name="HutBack" type="Node2D" parent="."]
 script = ExtResource("13")

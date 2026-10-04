@@ -24,8 +24,8 @@ uniform float blue_tint = 0.0;
 // Vin's visible radius (tin triples it): beyond it the night closes in.
 uniform vec2 vision_center;
 uniform float vision_radius = 100000.0;
-uniform vec4 mist_color : source_color = vec4(0.60, 0.65, 0.74, 1.0);
-uniform vec4 steel_color : source_color = vec4(0.55, 0.68, 0.95, 1.0);
+uniform vec4 mist_color : source_color = vec4(0.46, 0.50, 0.60, 1.0);
+uniform vec4 steel_color : source_color = vec4(0.45, 0.58, 0.9, 1.0);
 const float ATTRACT_RADIUS = 90.0;
 
 mat2 rot(float a) {
@@ -54,6 +54,10 @@ void fragment() {
 	float n1 = texture(noise_a, (p + drift * mist_time) / 320.0).r;
 	float n2 = texture(noise_b, (p + vec2(-drift.x * 0.6, drift.y * 1.5) * mist_time) / 170.0).r;
 	float n = n1 * 0.65 + n2 * 0.35;
+	// A near-camera layer: coarse wisps that slide faster than the world as
+	// the camera moves, so the fog has depth between Vin and the viewer.
+	vec2 near_p = world * 0.6 + cam_origin * 0.5 + vec2(drift.x * 1.8, drift.y) * mist_time;
+	float near = smoothstep(0.55, 0.9, texture(noise_b, near_p / 260.0).r);
 
 	vec2 muv = (world - map_origin) / map_size;
 	float pool = 0.0;
@@ -64,8 +68,11 @@ void fragment() {
 		open_air = dm.g;
 	}
 
-	float density = thickness * smoothstep(0.25, 0.85, n) * (0.55 + 0.9 * pool) + gather * 0.18;
-	density += thickness * 0.18;
+	// Wisps, not a blanket: high-contrast noise, thin in open air, pooling
+	// thick on roofs and floors, gathering where metal burns.
+	float wisp = smoothstep(0.45, 0.85, n);
+	float density = thickness * (0.04 + 0.5 * wisp) * (0.3 + 1.6 * pool) + gather * 0.18;
+	density += thickness * near * 0.25;
 	for (int i = 0; i < repeller_count; i++) {
 		float radius = repellers[i].z;
 		float r = distance(world, repellers[i].xy);
@@ -74,9 +81,12 @@ void fragment() {
 	density *= open_air;
 	density *= 1.0 - thin * 0.75;
 	vec3 col = mix(mist_color.rgb, steel_color.rgb, blue_tint);
-	float alpha = clamp(density, 0.0, 0.62);
-	float outside = smoothstep(vision_radius * 0.55, vision_radius, distance(world, vision_center));
-	col = mix(col, vec3(0.025, 0.03, 0.045), outside * 0.6);
-	alpha = max(alpha, outside * 0.32);
+	float alpha = clamp(density, 0.0, 0.5);
+	// The night closes in softly beyond Vin's sight: a wide, gentle falloff
+	// rather than a disc.
+	float outside = smoothstep(vision_radius * 0.4, vision_radius * 1.6, distance(world, vision_center));
+	// Beyond her sight the night darkens (toward black, never toward grey).
+	col = mix(col, vec3(0.01, 0.012, 0.02), outside);
+	alpha = mix(alpha, max(alpha, 0.45), outside);
 	COLOR = vec4(col, alpha);
 }
