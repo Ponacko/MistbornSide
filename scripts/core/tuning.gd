@@ -132,6 +132,25 @@ func jump_speed() -> float:
 ## Landing faster than this kills a guard (a fall from a roof).
 @export var fall_death_speed := 520.0
 
+@export_group("Hazekillers and Inquisitors")
+@export var hazekiller_staff_damage := 18.0
+@export var hazekiller_reach := 34.0
+@export var hazekiller_windup := 0.35
+@export var hazekiller_cooldown := 1.2
+## At most this many squad members strike at once.
+@export var squad_attackers := 2
+@export var bendal_speed := 165.0
+## Bendal speeds up to this when he falls far behind, keeping the pressure on.
+@export var bendal_catch_up_speed := 200.0
+@export var bendal_catch_up_gap := 320.0
+@export var bendal_axe_damage := 75.0
+@export var bendal_reach := 34.0
+@export var bendal_windup := 0.3
+@export var bendal_second_swing := 0.25
+## The gap in his attack pattern that atium reveals.
+@export var bendal_recover := 0.9
+@export var bendal_coin_return_range := 70.0
+
 @export_group("Stealth")
 ## Suspicion per second when Vin is in plain sight, close up.
 @export var see_rate := 1.3

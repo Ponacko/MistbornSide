@@ -96,12 +96,32 @@ func receive_push(impulse: Vector2, _from: MetalSource) -> Vector2:
 	return PushPhysics.dynamic(self, impulse, t.vin_mass, t)
 
 
+func _physics_process(_delta: float) -> void:
+	# A coin someone else Pushed can hit Vin.
+	if thrower == null or thrower is Vin or not is_lethal():
+		return
+	var v := get_tree().get_first_node_in_group("player") as Vin
+	if v == null:
+		return
+	var d := global_position - v.global_position
+	if absf(d.x) < Vin.HALF_WIDTH + 3.0 and d.y < 2.0 and d.y > -Vin.STAND_HEIGHT:
+		v.take_hit(Hit.make(Hit.Kind.COIN, 25.0, linear_velocity.normalized(), self, true))
+		linear_velocity *= 0.15
+		thrower = null
+
+
 func is_lethal() -> bool:
 	return linear_velocity.length() > Game.tuning.coin_lethal_speed
 
 
 func _on_body_entered(body: Node) -> void:
 	if body == thrower or not is_lethal():
+		return
+	if body is Enemy:
+		if not body.take_hit(Hit.make(Hit.Kind.COIN, 100.0, linear_velocity.normalized(), self)):
+			linear_velocity = -linear_velocity * 0.35
+		else:
+			linear_velocity *= 0.15
 		return
 	if body.has_method("take_hit"):
 		body.take_hit(Hit.make(Hit.Kind.COIN, 100.0, linear_velocity.normalized(), self))
