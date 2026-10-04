@@ -7,7 +7,7 @@ var started := false
 
 
 func _physics_process(delta: float) -> void:
-	if not started:
+	if not started and get_tree().get_first_node_in_group("course_goal") != null:
 		var vin := get_tree().get_first_node_in_group("player") as Vin
 		if vin and (vin.controls.move != Vector2.ZERO or vin.controls.jump_held or vin.controls.push_held or vin.controls.pull_held):
 			started = true

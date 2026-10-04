@@ -44,6 +44,9 @@ var bronze_on := false
 ## Seconds of the pewter crash left: the stagger, then the slowdown.
 var crash_time_left := 0.0
 var invulnerable := false
+## Atium beads carried (rare: a few in all of Act 1).
+var atium_beads := 0
+var _input_locks: Array[Object] = []
 var combat: VinCombat
 ## Atium widens the dodge window and makes counters auto-aim.
 var dodge_window_scale := 1.0
@@ -138,8 +141,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		controls.on_input_event(event)
 
 
+## Dialogue and cutscenes hold Vin still; each holder unlocks its own lock.
+func lock_input(holder: Object) -> void:
+	if not _input_locks.has(holder):
+		_input_locks.append(holder)
+
+
+func unlock_input(holder: Object) -> void:
+	_input_locks.erase(holder)
+
+
+func input_locked() -> bool:
+	_input_locks = _input_locks.filter(func(h): return is_instance_valid(h))
+	return not _input_locks.is_empty()
+
+
 func _physics_process(delta: float) -> void:
-	if not scripted:
+	if input_locked():
+		controls.clear()
+	elif not scripted:
 		controls.read_device(self, delta)
 	var t := Game.tuning
 	_forgiveness.coyote_time = t.coyote_time

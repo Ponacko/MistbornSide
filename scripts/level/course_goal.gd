@@ -19,6 +19,7 @@ func _ready() -> void:
 	shape.position = Vector2(0, -size.y / 2.0)
 	add_child(shape)
 	body_entered.connect(_on_body_entered)
+	add_to_group("course_goal")
 
 
 func _on_body_entered(body: Node) -> void:

@@ -109,6 +109,11 @@ func read_device(owner: Node2D, delta: float) -> void:
 ## Clears one-frame edges. Called at the end of each physics frame in scripted
 ## mode so a test's "press" lasts exactly one frame.
 func end_frame() -> void:
+	_last_pressed.clear()
+	for a in PRESS_ACTIONS:
+		if action_pressed(a):
+			_last_pressed[a] = true
+	_last_frame = Engine.get_physics_frames()
 	jump_pressed = false
 	flare_pressed = false
 	push_pressed = false
@@ -124,3 +129,44 @@ func end_frame() -> void:
 	interact_pressed = false
 	target_cycle = 0
 	aim_moved = false
+
+
+const PRESS_ACTIONS := ["jump", "push", "pull", "coin", "dagger", "dodge", "toggle_pewter", "toggle_tin",
+	"toggle_copper", "toggle_bronze", "flare", "interact"]
+var _last_pressed := {}
+var _last_frame := -1
+
+
+## Whether the named input action was pressed this frame (scripted mode),
+## including by a node that processed before the reader this frame.
+func action_pressed(action: String) -> bool:
+	if _last_frame == Engine.get_physics_frames() and _last_pressed.has(action):
+		return true
+	match action:
+		"jump": return jump_pressed
+		"push": return push_pressed
+		"pull": return pull_pressed
+		"coin": return coin_pressed
+		"dagger": return dagger_pressed
+		"dodge": return dodge_pressed
+		"toggle_pewter": return toggle_pewter
+		"toggle_tin": return toggle_tin
+		"toggle_copper": return toggle_copper
+		"toggle_bronze": return toggle_bronze
+		"flare": return flare_pressed
+		"atium": return atium_held
+		"interact": return interact_pressed
+	return false
+
+
+## Everything released: what a locked player sends.
+func clear() -> void:
+	end_frame()
+	move = Vector2.ZERO
+	jump_held = false
+	push_held = false
+	pull_held = false
+	flare_held = false
+	coin_held = false
+	dagger_held = false
+	atium_held = false

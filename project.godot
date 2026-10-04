@@ -26,6 +26,7 @@ NoiseBus="*res://scripts/core/noise_bus.gd"
 Settings="*res://scripts/core/settings.gd"
 Checkpoints="*res://scripts/level/checkpoints.gd"
 CourseClock="*res://scripts/level/course_clock.gd"
+StoryFlags="*res://scripts/story/story_flags.gd"
 
 [display]
 

@@ -1,0 +1,27 @@
+{
+	"start": "intro",
+	"nodes": {
+		"intro": {
+			"speaker": "Kelsier",
+			"lines": ["Camon will be at the meeting. He is greedy, and he is afraid of me.", "You have been nudging people's emotions your whole life. Try it on him."],
+			"next": "choice"
+		},
+		"choice": {
+			"speaker": "Vin",
+			"prompt": "Camon glowers across the table.",
+			"choices": [
+				{"text": "Soothe his anger", "kind": "soothe", "set": {"camon_soothed": true}, "next": "soothed"},
+				{"text": "Riot his greed", "kind": "riot", "set": {"camon_rioted": true}, "next": "rioted"}
+			]
+		},
+		"soothed": {"speaker": "Camon", "lines": ["...Fine. Fine. Take the girl."], "next": "later"},
+		"rioted": {"speaker": "Camon", "lines": ["Then pay me double, Survivor!"], "next": "later"},
+		"later": {
+			"speaker": "Kelsier",
+			"lines": [
+				{"text": "Gently done. He will not even remember being angry.", "if": "camon_soothed"},
+				{"text": "Subtle as a brick. We will be paying for that greed.", "if": "camon_rioted"}
+			]
+		}
+	}
+}
