@@ -28,6 +28,11 @@ func respawn(vin: Vin) -> void:
 	vin.respawn_at(position)
 	vin.reserves.restore(_snapshot.reserves)
 	vin.pouch.count = _snapshot.pouch
+	# A wounded chase restarts with enough pewter to be winnable, however
+	# low it was when the checkpoint was touched.
+	if vin.wounded:
+		var floor_amount := MetalReserves.FULL * 0.4
+		vin.reserves.set_amount(MetalReserves.Metal.PEWTER, maxf(vin.reserves.amount(MetalReserves.Metal.PEWTER), floor_amount))
 	respawned.emit()
 
 

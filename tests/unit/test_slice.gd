@@ -173,3 +173,26 @@ func test_game_flow_loads_a_mission_and_returns_to_the_title() -> void:
 	assert_true(tree.current_scene is TitleScreen, "back at the title")
 	tree.current_scene.queue_free()
 	await process_frames(1)
+
+
+func test_replaying_a_mission_resets_its_beats_but_keeps_completion() -> void:
+	StoryFlags.clear()
+	StoryFlags.set_flag("mission_04_done")
+	StoryFlags.set_flag("prompt_seen_m04_tin")
+	StoryFlags.set_flag("m04_wall")
+	StoryFlags.set_flag("m09_logbook")
+	StoryFlags.clear_mission("04")
+	assert_false(StoryFlags.get_flag("prompt_seen_m04_tin"), "prompts show again on a replay")
+	assert_false(StoryFlags.get_flag("m04_wall"), "the ending can fire again")
+	assert_true(StoryFlags.get_flag("mission_04_done"), "completion kept")
+	assert_true(StoryFlags.get_flag("m09_logbook"), "other missions untouched")
+
+
+func test_a_wounded_respawn_has_enough_pewter_to_run() -> void:
+	var w := TestWorld.create(self, [FLOOR], Vector2(0, -1))
+	await physics_frames(2)
+	w.vin.wound(10.0)
+	w.vin.reserves.set_amount(MetalReserves.Metal.PEWTER, 2.0)
+	Checkpoints.reach(w.vin, Vector2(0, -1))
+	Checkpoints.respawn(w.vin)
+	assert_gt(w.vin.reserves.amount(MetalReserves.Metal.PEWTER), 30.0, "not a death loop")

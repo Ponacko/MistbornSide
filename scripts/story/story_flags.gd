@@ -21,6 +21,14 @@ func has_flag(flag: String) -> bool:
 	return _flags.has(flag)
 
 
+## Forgets one mission's beats (prompts seen, triggers fired) so it can be
+## played again; its completion flag stays.
+func clear_mission(id: String) -> void:
+	for k in _flags.keys():
+		if k.begins_with("m%s_" % id) or k.begins_with("prompt_seen_m%s_" % id):
+			_flags.erase(k)
+
+
 func clear() -> void:
 	_flags.clear()
 

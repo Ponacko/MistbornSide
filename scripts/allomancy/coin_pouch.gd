@@ -19,7 +19,9 @@ func _init(owner_vin: Vin) -> void:
 
 func physics_update(_delta: float) -> void:
 	var c := vin.controls
-	if (c.coin_pressed and c.push_held) or (c.push_pressed and c.coin_held):
+	# Spray is E pressed while Push is held; a Push clicked while E is still
+	# down from a drop is a Push on that coin, not a spray.
+	if c.coin_pressed and c.push_held:
 		spray()
 	elif c.coin_pressed:
 		if c.move.y > 0.5:

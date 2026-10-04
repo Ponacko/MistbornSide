@@ -58,6 +58,7 @@ func start_mission(id: String) -> void:
 	var m := mission(id)
 	if m.is_empty():
 		return
+	StoryFlags.clear_mission(id)
 	Checkpoints.reset_for_test()
 	get_tree().paused = false
 	get_tree().change_scene_to_file(m.scene)
