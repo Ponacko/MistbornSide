@@ -91,6 +91,7 @@ func _heavy(t: Tuning) -> void:
 ## A dagger on an unaware enemy from behind is a backstab.
 func _strike(kind: Hit.Kind, damage: float, reach: float, light: bool) -> bool:
 	NoiseBus.emit(vin.global_position, 0.5, NoiseBus.Kind.FIGHT)
+	Audio.play("dagger", vin.global_position, -6.0)
 	if vin.counter_aim:
 		_aim_counter(reach)
 	var any := false

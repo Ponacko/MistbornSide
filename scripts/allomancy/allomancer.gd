@@ -6,6 +6,10 @@ extends Node
 
 enum Mode { NONE, PUSH, PULL }
 
+signal target_locked(source: MetalSource)
+## A Push or Pull began carrying Vin (not a coin flying off her hand).
+signal launched
+
 ## One entry per visible source: {source, id, to, width, alpha, carried, through_wall, inside_body}.
 var lines: Array[Dictionary] = []
 var target: MetalSource
@@ -22,6 +26,8 @@ var force_dir := Vector2.ZERO
 var cycle_candidates: Array[MetalSource] = []
 
 var _cycle_id: Variant = null
+var _last_target: MetalSource
+var _was_forced := false
 ## After a forced release (jumping off a bracket), a still-held button does
 ## nothing until it is let go and pressed again.
 var _ignore_held := false
@@ -79,6 +85,10 @@ func _update_lines_and_target() -> void:
 	var ctx := _context()
 	var picked := TargetScorer.pick(_candidates, ctx)
 	_update_cycle(ctx, picked)
+	if target != _last_target and target != null:
+		target_locked.emit(target)
+		Audio.play("pluck", Vector2.INF, -10.0)
+	_last_target = target
 
 
 ## Mouse wheel or Q steps through candidates near the aim point; the pick
@@ -113,6 +123,7 @@ func _update_cycle(ctx: TargetScorer.Context, picked: Dictionary) -> void:
 
 
 func _apply_force(delta: float) -> void:
+	_was_forced = force_active
 	force_active = false
 	var c := vin.controls
 	var t := Game.tuning
@@ -183,6 +194,9 @@ func _apply_force(delta: float) -> void:
 	vin.reserves.burn(metal, delta, c.flare_held)
 	force_active = true
 	force_dir = vin_dir
+	if not _was_forced and dv.length() > 0.5:
+		launched.emit()
+		Audio.play("thump", Vector2.INF, -4.0)
 	if mode == Mode.PULL and locked.kind == MetalSource.Kind.ANCHORED:
 		# Swept catch: also cling if this frame's flight passes close by.
 		var step_end := _cur_chest + vin.velocity * delta

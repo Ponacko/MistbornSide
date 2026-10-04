@@ -59,6 +59,7 @@ func flash(_from: Vector2) -> void:
 	if not vin.tin_on:
 		return
 	whiteout = 1.0
+	Audio.play("whiteout", Vector2.INF, -6.0)
 	vin.stun(Game.tuning.tin_flash_stun)
 
 

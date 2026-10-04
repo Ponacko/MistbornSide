@@ -54,6 +54,8 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		if n.dot(Vector2.UP) > 0.6:
 			grounded = true
 			ground_normal = n
+	if grounded and _since_ground > 6 and state.linear_velocity.length() > 40.0:
+		Audio.play.call_deferred("coin_ring", global_position, -10.0)
 	_since_ground = 0 if grounded else _since_ground + 1
 	var cap := Game.tuning.projectile_max_speed * 1.05
 	if state.linear_velocity.length() > cap:

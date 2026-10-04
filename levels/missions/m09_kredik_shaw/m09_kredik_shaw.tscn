@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
@@ -26,6 +26,7 @@
 [ext_resource type="Script" path="res://scripts/enemies/bendal.gd" id="24"]
 [ext_resource type="Script" path="res://scripts/level/logbook.gd" id="25"]
 [ext_resource type="Script" path="res://scripts/allomancy/coin.gd" id="26"]
+[ext_resource type="Script" path="res://scripts/audio/music_zone.gd" id="27"]
 
 [node name="KredikShaw" type="Node2D"]
 script = ExtResource("17")
@@ -448,3 +449,7 @@ script = ExtResource("10")
 
 [node name="TuningPanel" type="CanvasLayer" parent="."]
 script = ExtResource("11")
+
+[node name="Music" type="Node" parent="."]
+script = ExtResource("27")
+track = "kredik_shaw"
