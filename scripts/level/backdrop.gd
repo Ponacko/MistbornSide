@@ -12,6 +12,10 @@ extends Node2D
 	set(value):
 		color = value
 		queue_redraw()
+@export var style := PixelTextures.Style.GREY:
+	set(value):
+		style = value
+		queue_redraw()
 
 
 func _ready() -> void:
@@ -19,4 +23,8 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), color)
+	if style == PixelTextures.Style.GREY:
+		draw_rect(Rect2(Vector2.ZERO, size), color)
+		return
+	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	draw_texture_rect(PixelTextures.texture(style), Rect2(Vector2.ZERO, size), true, color)

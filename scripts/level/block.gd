@@ -12,6 +12,15 @@ extends StaticBody2D
 	set(value):
 		color = value
 		queue_redraw()
+## Surface art: GREY is the grey box; the others are normal-mapped textures.
+@export var style := PixelTextures.Style.GREY:
+	set(value):
+		style = value
+		queue_redraw()
+## Solid but undrawn: invisible walls and tutorial gates.
+@export var invisible := false
+## Black ash running down from the top edge, as on every building in Luthadel.
+@export var ash := true
 
 var _shape: CollisionShape2D
 
@@ -36,5 +45,16 @@ func _rebuild() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), color)
-	draw_rect(Rect2(Vector2.ZERO, Vector2(size.x, 2)), color.lightened(0.2))
+	if invisible and not Engine.is_editor_hint():
+		return
+	if style == PixelTextures.Style.GREY:
+		draw_rect(Rect2(Vector2.ZERO, size), color)
+		draw_rect(Rect2(Vector2.ZERO, Vector2(size.x, 2)), color.lightened(0.2))
+		return
+	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	draw_texture_rect(PixelTextures.texture(style), Rect2(Vector2.ZERO, size), true)
+	draw_rect(Rect2(Vector2.ZERO, Vector2(size.x, 2)), Color(0.42, 0.42, 0.46))
+	if ash:
+		var bands := mini(int(size.y / 2.0), 10)
+		for i in bands:
+			draw_rect(Rect2(0, 2 + i * 2, size.x, 2), Color(0.02, 0.02, 0.025, 0.45 * (1.0 - float(i) / bands)))

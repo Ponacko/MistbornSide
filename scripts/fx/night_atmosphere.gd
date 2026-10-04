@@ -3,11 +3,11 @@ extends Node2D
 ## Drop into a level to make it night in Luthadel: darkened world, the
 ## mists, falling ash. Lanterns (Lantern nodes) light it.
 
-@export var darkness := Color(0.2, 0.22, 0.3)
+@export var darkness := Color(0.34, 0.36, 0.46)
 @export var mist_thickness := 0.35
 
 ## How far tin lifts the darkness.
-@export var tin_darkness := Color(0.45, 0.47, 0.56)
+@export var tin_darkness := Color(0.55, 0.57, 0.66)
 
 var mists: MistLayer
 var _modulate: CanvasModulate

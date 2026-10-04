@@ -32,6 +32,7 @@ var _canvas: Control
 func _ready() -> void:
 	layer = CanvasLayers.HUD
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("hud")
 	_canvas = Control.new()
 	_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE

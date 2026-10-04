@@ -550,7 +550,11 @@ func _try_ledge_grab() -> void:
 	var top := _ray(Vector2(low.position.x + dir * 2.0, hand.y - 8.0), Vector2(low.position.x + dir * 2.0, hand.y + 8.0))
 	if top.is_empty() or top.normal.y > -0.7:
 		return
-	global_position = Vector2(low.position.x - dir * (HALF_WIDTH + 0.5), top.position.y - LEDGE_HAND_Y)
+	var hang := Vector2(low.position.x - dir * (HALF_WIDTH + 0.5), top.position.y - LEDGE_HAND_Y)
+	# Never snap down into the floor to "grab" a low step.
+	if hang.y > global_position.y + 1.0:
+		return
+	global_position = hang
 	_ledge_point = top.position
 	velocity = Vector2.ZERO
 	facing = dir

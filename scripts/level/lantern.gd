@@ -14,9 +14,14 @@ extends Node2D
 @export var metal := true
 ## Seconds between flashes (a lamplighter unshuttering); 0 never flashes.
 @export var flash_interval := 0.0
+## Flashes before stopping; 0 keeps flashing.
+@export var flash_count := 0
+## Flashing waits for this story flag (a lesson beat), if set.
+@export var flash_after_flag := ""
 
 var _flash_timer := 0.0
 var _flash_glow := 0.0
+var _flashes := 0
 
 var light: PointLight2D
 
@@ -48,7 +53,7 @@ func _update_light() -> void:
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint() or light == null:
 		return
-	if flash_interval > 0.0:
+	if flash_interval > 0.0 and (flash_after_flag == "" or StoryFlags.get_flag(flash_after_flag)) and (flash_count == 0 or _flashes < flash_count):
 		_flash_timer += delta
 		if _flash_timer >= flash_interval:
 			_flash_timer = 0.0
@@ -60,6 +65,7 @@ func _physics_process(delta: float) -> void:
 ## Unshutters the lantern at full blaze: blinds a tin-burner who sees it.
 func flash() -> void:
 	_flash_glow = 1.0
+	_flashes += 1
 	var vin := get_tree().get_first_node_in_group("player") as Vin
 	if vin and vin.chest_position().distance_to(global_position) < radius * 1.5:
 		var q := PhysicsRayQueryParameters2D.create(global_position, vin.chest_position(), Layers.WORLD)

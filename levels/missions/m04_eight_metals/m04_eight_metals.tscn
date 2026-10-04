@@ -1,0 +1,474 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/core/game_camera.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/fx/night_atmosphere.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/level/lantern.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/level/backdrop.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/level/kill_zone.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/level/checkpoint.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/fx/screen_fx.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/ui/tuning_panel.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/level/metal_prop.gd" id="12"]
+[ext_resource type="Script" path="res://scripts/story/story_trigger.gd" id="13"]
+[ext_resource type="Script" path="res://scripts/story/tutorial_prompt.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/allies/kelsier.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/allies/kelsier_marker.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/story/missions/m04_eight_metals.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/fx/mist_interior.gd" id="18"]
+[ext_resource type="Script" path="res://scripts/level/noise_emitter.gd" id="19"]
+[ext_resource type="Script" path="res://scripts/level/vial_pickup.gd" id="20"]
+[ext_resource type="Script" path="res://scripts/allomancy/coin.gd" id="21"]
+
+[node name="EightMetals" type="Node2D"]
+script = ExtResource("17")
+mission_id = "04"
+title = "Eight Metals"
+
+[node name="CityBackdrop" type="Node2D" parent="."]
+script = ExtResource("7")
+position = Vector2(-60, -760)
+size = Vector2(3080, 760)
+style = 2
+color = Color(0.42, 0.42, 0.48, 1)
+
+[node name="ShopBack" type="Node2D" parent="."]
+script = ExtResource("7")
+position = Vector2(0, -100)
+size = Vector2(240, 100)
+style = 4
+color = Color(0.9, 0.85, 0.8, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="ShopFloor" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(-60, 0)
+size = Vector2(400, 60)
+style = 5
+
+[node name="ShopWallL" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(-20, -110)
+size = Vector2(20, 110)
+style = 2
+
+[node name="ShopRoof" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(-20, -110)
+size = Vector2(280, 10)
+style = 1
+
+[node name="ShopWallR" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(240, -100)
+size = Vector2(16, 50)
+style = 2
+
+[node name="Step1" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(282, -35)
+size = Vector2(30, 95)
+style = 3
+
+[node name="Step2" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(312, -70)
+size = Vector2(28, 130)
+style = 3
+
+[node name="Stoop" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(256, 0)
+size = Vector2(26, 60)
+style = 3
+
+[node name="B1" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(340, -110)
+size = Vector2(360, 170)
+style = 1
+
+[node name="B2" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(845, -90)
+size = Vector2(255, 150)
+style = 1
+
+[node name="B3" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1100, -200)
+size = Vector2(250, 260)
+style = 1
+
+[node name="B4" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1650, -200)
+size = Vector2(250, 260)
+style = 1
+
+[node name="B5" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1950, -220)
+size = Vector2(200, 280)
+style = 1
+
+[node name="B6" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2420, -220)
+size = Vector2(230, 280)
+style = 1
+
+[node name="CityWall" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2650, -540)
+size = Vector2(300, 600)
+style = 3
+
+[node name="EndWall" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2950, -760)
+size = Vector2(40, 820)
+style = 3
+
+[node name="TinGate" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(480, -200)
+size = Vector2(8, 90)
+invisible = true
+
+[node name="PewterGate" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(690, -200)
+size = Vector2(8, 90)
+invisible = true
+
+[node name="ShopInterior" type="Node2D" parent="."]
+script = ExtResource("18")
+position = Vector2(0, -100)
+size = Vector2(240, 100)
+
+[node name="Street" type="Area2D" parent="."]
+script = ExtResource("8")
+position = Vector2(700, 30)
+size = Vector2(2260, 60)
+
+[node name="Metal" type="Node2D" parent="."]
+
+[node name="StreetLamp" type="Node2D" parent="Metal"]
+script = ExtResource("12")
+position = Vector2(1500, -260)
+style = 1
+
+[node name="FarBracket" type="Node2D" parent="Metal"]
+script = ExtResource("12")
+position = Vector2(1642, -230)
+style = 1
+
+[node name="Gate" type="Node2D" parent="Metal"]
+script = ExtResource("12")
+position = Vector2(1990, -244)
+style = 3
+
+[node name="Grate" type="Node2D" parent="Metal"]
+script = ExtResource("12")
+position = Vector2(2600, -222)
+style = 4
+
+[node name="WallPlate" type="Node2D" parent="Metal"]
+script = ExtResource("12")
+position = Vector2(2640, -390)
+style = 4
+
+[node name="LooseClip0" type="RigidBody2D" parent="."]
+script = ExtResource("21")
+position = Vector2(1720, -203)
+
+[node name="LooseClip1" type="RigidBody2D" parent="."]
+script = ExtResource("21")
+position = Vector2(1760, -203)
+
+[node name="LooseClip2" type="RigidBody2D" parent="."]
+script = ExtResource("21")
+position = Vector2(2010, -223)
+
+[node name="LooseClip3" type="RigidBody2D" parent="."]
+script = ExtResource("21")
+position = Vector2(2080, -223)
+
+[node name="ShopLamp" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(120, -60)
+metal = false
+radius = 150.0
+energy = 1.8
+
+[node name="RoofLamp" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(400, -160)
+metal = false
+
+[node name="Lamplighter" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(765, -30)
+metal = false
+flash_interval = 2.5
+flash_count = 2
+flash_after_flag = "m04_tin_after"
+
+[node name="B3Lamp" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(1250, -250)
+metal = false
+
+[node name="BracketLamp" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(1500, -272)
+metal = false
+radius = 80.0
+
+[node name="B5Lamp" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(2050, -270)
+metal = false
+
+[node name="B6Lamp" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(2550, -270)
+metal = false
+
+[node name="WallLamp" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(2800, -590)
+metal = false
+
+[node name="Patrol" type="Node2D" parent="."]
+script = ExtResource("19")
+position = Vector2(960, 20)
+walk_distance = 80.0
+loudness = 0.7
+
+[node name="Vial" type="Area2D" parent="."]
+script = ExtResource("20")
+position = Vector2(2500, -232)
+
+[node name="TinPrompt" type="Node" parent="."]
+script = ExtResource("14")
+prompt_id = "m04_tin"
+action = "toggle_tin"
+text = "Burn tin"
+gate_path = NodePath("../Geometry/TinGate")
+
+[node name="PewterPrompt" type="Node" parent="."]
+script = ExtResource("14")
+prompt_id = "m04_pewter"
+action = "toggle_pewter"
+text = "Burn pewter"
+gate_path = NodePath("../Geometry/PewterGate")
+
+[node name="CoinPrompt" type="Node" parent="."]
+script = ExtResource("14")
+prompt_id = "m04_coin"
+action = "coin"
+text = "Hold S and press E to drop a clip, then Push (LMB) on it"
+
+[node name="PullPrompt" type="Node" parent="."]
+script = ExtResource("14")
+prompt_id = "m04_pull"
+action = "pull"
+text = "Ironpull (hold RMB) on the lamp bracket"
+
+[node name="TinTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(400, -110)
+dialogue_file = "res://data/dialogue/m04.json"
+dialogue_node = "tin"
+once_flag = "m04_tin"
+prompt_path = NodePath("../TinPrompt")
+
+[node name="TinAfterTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(530, -110)
+dialogue_file = "res://data/dialogue/m04.json"
+dialogue_node = "tin_after"
+once_flag = "m04_tin_after"
+
+[node name="PewterTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(640, -110)
+dialogue_file = "res://data/dialogue/m04.json"
+dialogue_node = "pewter"
+once_flag = "m04_pewter"
+prompt_path = NodePath("../PewterPrompt")
+
+[node name="PewterAfterTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(870, -90)
+dialogue_file = "res://data/dialogue/m04.json"
+dialogue_node = "pewter_after"
+once_flag = "m04_pewter_after"
+
+[node name="CoinTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(1000, -90)
+dialogue_file = "res://data/dialogue/m04.json"
+dialogue_node = "coin"
+once_flag = "m04_coin"
+prompt_path = NodePath("../CoinPrompt")
+
+[node name="PullTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(1300, -200)
+dialogue_file = "res://data/dialogue/m04.json"
+dialogue_node = "pull"
+once_flag = "m04_pull"
+prompt_path = NodePath("../PullPrompt")
+
+[node name="RunTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(1700, -200)
+dialogue_file = "res://data/dialogue/m04.json"
+dialogue_node = "run"
+once_flag = "m04_run"
+
+[node name="WallTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(2780, -540)
+dialogue_file = "res://data/dialogue/m04.json"
+dialogue_node = "wall"
+once_flag = "m04_wall"
+
+[node name="Checkpoint0" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(60, 0)
+
+[node name="Checkpoint1" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(380, -110)
+
+[node name="Checkpoint2" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(870, -90)
+
+[node name="Checkpoint3" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(1130, -200)
+
+[node name="Checkpoint4" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(1680, -200)
+
+[node name="Checkpoint5" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(1980, -220)
+
+[node name="Checkpoint6" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(2440, -220)
+
+[node name="KelsierScript" type="Node2D" parent="."]
+
+[node name="01_ToDoor" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(250, -1)
+action = 0
+move = 0
+trigger_radius = 220.0
+
+[node name="02_LeapToRoof" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(430, -111)
+action = 0
+move = 2
+trigger_radius = 110.0
+
+[node name="03_WaitTin" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(430, -111)
+action = 1
+move = 0
+trigger_radius = 70.0
+
+[node name="04_WaitPewter" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(660, -111)
+action = 1
+move = 0
+trigger_radius = 70.0
+
+[node name="05_PewterLeap" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(900, -91)
+action = 0
+move = 2
+trigger_radius = 110.0
+
+[node name="06_CoinJump" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(1180, -201)
+action = 0
+move = 1
+trigger_radius = 100.0
+
+[node name="07_PullDemo" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(1642, -230)
+action = 0
+move = 3
+trigger_radius = 120.0
+
+[node name="08_WaitB4" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(1720, -201)
+action = 1
+move = 0
+trigger_radius = 70.0
+
+[node name="09_WaitB6" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(2480, -221)
+action = 1
+move = 0
+trigger_radius = 80.0
+
+[node name="10_WaitWall" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(2800, -541)
+action = 1
+move = 0
+trigger_radius = 70.0
+
+[node name="11_Companion" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(2820, -541)
+action = 2
+move = 0
+trigger_radius = 40.0
+
+[node name="Kelsier" type="Node2D" parent="."]
+script = ExtResource("15")
+position = Vector2(150, -1)
+mode = 1
+markers_path = NodePath("../KelsierScript")
+
+[node name="Night" type="Node2D" parent="."]
+script = ExtResource("5")
+
+[node name="Vin" parent="." instance=ExtResource("2")]
+position = Vector2(60, -1)
+
+[node name="Camera" type="Camera2D" parent="."]
+script = ExtResource("3")
+process_callback = 0
+target_path = NodePath("../Vin")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+script = ExtResource("4")
+
+[node name="ScreenFx" type="CanvasLayer" parent="."]
+script = ExtResource("10")
+
+[node name="TuningPanel" type="CanvasLayer" parent="."]
+script = ExtResource("11")

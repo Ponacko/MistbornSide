@@ -15,6 +15,7 @@ var _vin: Vin
 
 
 func _ready() -> void:
+	add_to_group("dialogue_box")
 	layer = CanvasLayers.DIALOGUE
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_canvas = Control.new()

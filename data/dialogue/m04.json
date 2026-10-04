@@ -1,0 +1,42 @@
+{
+	"start": "intro",
+	"nodes": {
+		"intro": {"speaker": "Kelsier", "lines": [
+			"Clubs keeps his shop dark at night. Good. Nobody watches a dark shop.",
+			"Here. A mistcloak. Every Mistborn wears one. It hides your outline from the soldiers.",
+			"And drink this. Eight metals, flakes in alcohol. You will feel them in your stomach, like little reserves."
+		], "next": null},
+		"tin": {"speaker": "Kelsier", "lines": [
+			"Tin first. Burn it and your senses sharpen: the mists thin, the night grows bright, and you hear what the city whispers.",
+			"Find the tin inside you and burn it."
+		], "next": null},
+		"tin_after": {"speaker": "Kelsier", "lines": [
+			"Listen. A patrol, two streets over.",
+			"But mind the light. Look at that lamplighter. With tin burning, a lantern in your face is a hammer to the eyes."
+		], "next": null},
+		"pewter": {"speaker": "Kelsier", "lines": [
+			"You will never make that gap on your own legs. Burn pewter: strength, speed, balance.",
+			"Burn it now, then run and jump."
+		], "next": null},
+		"pewter_after": {"speaker": "Kelsier", "lines": [
+			"Pewter keeps you on your feet, until it runs out. Flare it too long and you will collapse where you stand."
+		], "next": null},
+		"coin": {"speaker": "Kelsier", "lines": [
+			"Now the fun part. Steel. Burn it and you will see blue lines to every bit of metal around you.",
+			"Take these clips. Drop one, stand over it, and Push. Push from your centre, straight down, or it skids away.",
+			"Watch me."
+		], "next": null},
+		"pull": {"speaker": "Kelsier", "lines": [
+			"Iron is steel's sister. Pull, and the metal comes to you, or you go to the metal, whichever is lighter.",
+			"That lamp bracket across the street is heavier than you. Pull on it.",
+			"And when you are done, hold Pull with nothing in your sights and your clips will come home."
+		], "next": null},
+		"run": {"speaker": "Kelsier", "lines": [
+			"Good. Now keep up. The city wall, before the mists lift."
+		], "next": null},
+		"wall": {"speaker": "Kelsier", "lines": [
+			"Welcome to the night, Vin. It belongs to us now.",
+			"Copper, bronze, zinc and brass you will learn in time. Tonight you flew."
+		], "next": null}
+	}
+}
