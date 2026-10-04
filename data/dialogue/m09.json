@@ -1,0 +1,31 @@
+{
+	"start": "approach",
+	"nodes": {
+		"approach": {"speaker": "Kelsier", "lines": [
+			"Kredik Shaw. The Hill of a Thousand Spires. Obligators walk the yard, and some of them are Seekers.",
+			"Keep your copper burning and stay off the ground. Meet me on the balcony."
+		], "next": null},
+		"inside": {"speaker": "Kelsier", "lines": [
+			"From here we fight. Their armour is a gift: Push it and the man goes with it.",
+			"Stay close."
+		], "next": null},
+		"soothing": {"speaker": "Vin", "lines": [
+			"Everything feels... heavy. Flat. Like the air is pressing the feeling out of me.",
+			{"text": "Copper. Burn copper and it stops.", "unless": "m09_copper_known"}
+		], "next": null},
+		"hut": {"speaker": "Kelsier", "lines": [
+			"A hut. Here, in the heart of his palace. The Lord Ruler kept something here.",
+			"I will open it. Go ahead and look for anything he wrote."
+		], "next": null},
+		"bendal": {"speaker": "Kelsier", "lines": [
+			"Inquisitor! Vin, you cannot fight him. Burn your atium, read him, take the book and RUN."
+		], "next": null},
+		"wound": {"speaker": "Vin", "lines": [
+			"The axe... cold, so cold. Pewter. Keep the pewter burning. Run."
+		], "next": null},
+		"collapse": {"speaker": "Sazed", "lines": [
+			"Child? Child! Lord Kelsier said... no matter. Into the carriage. Quickly now.",
+			"Stay with me, Mistress Vin."
+		], "next": null}
+	}
+}

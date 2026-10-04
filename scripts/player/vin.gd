@@ -44,6 +44,14 @@ var bronze_on := false
 ## Seconds of the pewter crash left: the stagger, then the slowdown.
 var crash_time_left := 0.0
 var invulnerable := false
+## Under the Soothing of Kredik Shaw (set by a SoothingField).
+var soothed := false
+## The Inquisitor's axe wound (the chase): health pinned to a sliver with no
+## regeneration, pewter locked on and draining, death when it runs out.
+var wounded := false
+var wound_health := 10.0
+## Blows taken while wounded; the screen edges darken with each.
+var wound_hits := 0
 ## Atium beads carried (rare: a few in all of Act 1).
 var atium_beads := 0
 var _input_locks: Array[Object] = []
@@ -222,8 +230,13 @@ func pewter_flared() -> bool:
 ## continuously while on and goes out when its reserve is empty.
 func _burn_toggles(delta: float, t: Tuning) -> void:
 	var c := controls
-	if c.toggle_pewter:
+	if c.toggle_pewter and not wounded:
 		pewter_on = not pewter_on and reserves.has(MetalReserves.Metal.PEWTER)
+	if wounded:
+		pewter_on = reserves.has(MetalReserves.Metal.PEWTER)
+		if not pewter_on and not health.is_dead():
+			health.damage(health.current)
+			return
 	if c.toggle_tin:
 		tin_on = not tin_on and reserves.has(MetalReserves.Metal.TIN)
 	if c.toggle_copper:
@@ -233,7 +246,8 @@ func _burn_toggles(delta: float, t: Tuning) -> void:
 	var flared := pewter_flared()
 	if pewter_on:
 		reserves.burn(MetalReserves.Metal.PEWTER, delta, flared)
-		health.heal(t.pewter_regen * delta)
+		if not wounded:
+			health.heal(t.pewter_regen * delta)
 	if _pewter.update(delta, pewter_on, flared, reserves.has(MetalReserves.Metal.PEWTER), t):
 		_crash(t)
 	if pewter_on and not reserves.has(MetalReserves.Metal.PEWTER):
@@ -248,6 +262,8 @@ func _burn_toggles(delta: float, t: Tuning) -> void:
 	jump_scale = (t.pewter_flare_jump if flared else (t.pewter_jump if pewter_on else 1.0))
 	if slowed:
 		speed_scale *= t.crash_slow_speed
+	if soothed:
+		speed_scale *= t.soothed_speed
 
 
 func _crash(t: Tuning) -> void:
@@ -257,7 +273,17 @@ func _crash(t: Tuning) -> void:
 	crashed.emit()
 
 
-## Puts Vin back on her feet at a checkpoint: still, calm, whole.
+## The axe wound: from now on health is a sliver and pewter keeps her up.
+func wound(hp: float) -> void:
+	wounded = true
+	wound_health = hp
+	wound_hits = 0
+	health.reset(hp)
+	pewter_on = reserves.has(MetalReserves.Metal.PEWTER)
+
+
+## Puts Vin back on her feet at a checkpoint: still, calm, whole (or, when
+## wounded, back to the sliver she had).
 func respawn_at(at: Vector2) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
@@ -271,7 +297,8 @@ func respawn_at(at: Vector2) -> void:
 	_apply_shape()
 	allomancy.steelsight.cancel()
 	atium.stop()
-	health.reset()
+	health.reset(wound_health if wounded else -1.0)
+	wound_hits = 0
 	reset_physics_interpolation()
 	cloak.reset(global_position + SHOULDERS)
 
@@ -347,6 +374,8 @@ func take_hit(hit: Hit) -> bool:
 	elif pewter_on:
 		mult = t.pewter_damage
 	health.damage(hit.damage * mult)
+	if wounded:
+		wound_hits += 1
 	hurt.emit(hit)
 	if not (pewter_on and hit.light):
 		velocity += hit.direction * 120.0

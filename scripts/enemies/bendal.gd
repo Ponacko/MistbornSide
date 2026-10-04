@@ -14,6 +14,8 @@ enum Phase { WAITING, PURSUING, ATTACKING, RECOVERING, DONE }
 @export var route := PackedVector2Array()
 ## Optional Line2D whose points are the route.
 @export var route_line: NodePath
+## Stands his post and fights instead of running a route (the chamber).
+@export var hold_ground := false
 ## Starts the pursuit this long after the level begins; negative waits for start().
 @export var start_delay := -1.0
 
@@ -112,6 +114,9 @@ func _pursue(delta: float, v: Vin, t: Tuning) -> void:
 	if v and not v.is_dead():
 		var dx := v.global_position.x - global_position.x
 		face_toward(v.global_position.x)
+		if hold_ground and absf(dx) > t.bendal_reach and absf(dx) < 140.0 and absf(v.global_position.y - global_position.y) < 40.0:
+			# Step in to meet her, but never leave the post for long.
+			global_position.x += signf(dx) * minf(t.bendal_speed * 0.5 * delta, absf(dx) - t.bendal_reach)
 		if absf(dx) <= t.bendal_reach and absf(v.global_position.y - global_position.y) < 40.0:
 			phase = Phase.ATTACKING
 			_swings_left = 2
@@ -120,8 +125,24 @@ func _pursue(delta: float, v: Vin, t: Tuning) -> void:
 	var gap := 0.0
 	if v:
 		gap = v.global_position.x - global_position.x
+	if hold_ground:
+		return
 	var speed := t.bendal_catch_up_speed if gap > t.bendal_catch_up_gap else t.bendal_speed
 	_advance(speed * delta)
+
+
+## Sends him down a new route as a pursuer (from the chamber to the chase).
+func begin_chase(new_route: PackedVector2Array, delay: float) -> void:
+	hold_ground = false
+	route = new_route
+	_measure()
+	progress = 0.0
+	_last_segment = -1
+	phase = Phase.WAITING
+	if not route.is_empty():
+		global_position = route[0]
+		reset_physics_interpolation()
+	get_tree().create_timer(delay, false).timeout.connect(start)
 
 
 func _advance(distance: float) -> void:

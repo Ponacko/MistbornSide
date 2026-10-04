@@ -151,6 +151,10 @@ func jump_speed() -> float:
 @export var bendal_recover := 0.9
 @export var bendal_coin_return_range := 70.0
 
+@export_group("Kredik Shaw")
+## Speed multiplier while the Soothing weighs on Vin without copper.
+@export var soothed_speed := 0.8
+
 @export_group("Atium")
 ## Hold Tab this long to burn a bead (prevents waste).
 @export var atium_confirm_time := 0.35

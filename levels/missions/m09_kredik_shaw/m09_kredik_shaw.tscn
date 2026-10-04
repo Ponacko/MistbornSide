@@ -1,0 +1,450 @@
+[gd_scene load_steps=27 format=3]
+
+[ext_resource type="Script" path="res://scripts/level/block.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/vin.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/core/game_camera.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/fx/night_atmosphere.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/level/lantern.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/level/backdrop.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/level/kill_zone.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/level/checkpoint.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/fx/screen_fx.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/ui/tuning_panel.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/level/metal_prop.gd" id="12"]
+[ext_resource type="Script" path="res://scripts/story/story_trigger.gd" id="13"]
+[ext_resource type="Script" path="res://scripts/story/tutorial_prompt.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/allies/kelsier.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/allies/kelsier_marker.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/story/missions/m09_kredik_shaw.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/fx/mist_interior.gd" id="18"]
+[ext_resource type="Script" path="res://scripts/enemies/guard.gd" id="19"]
+[ext_resource type="Script" path="res://scripts/enemies/obligator.gd" id="20"]
+[ext_resource type="Script" path="res://scripts/stealth/alarm_bell.gd" id="21"]
+[ext_resource type="Script" path="res://scripts/level/arena_lock.gd" id="22"]
+[ext_resource type="Script" path="res://scripts/stealth/soothing_field.gd" id="23"]
+[ext_resource type="Script" path="res://scripts/enemies/bendal.gd" id="24"]
+[ext_resource type="Script" path="res://scripts/level/logbook.gd" id="25"]
+[ext_resource type="Script" path="res://scripts/allomancy/coin.gd" id="26"]
+
+[node name="KredikShaw" type="Node2D"]
+script = ExtResource("17")
+mission_id = "09"
+title = "Kredik Shaw"
+
+[node name="SpireBackdrop" type="Node2D" parent="."]
+script = ExtResource("7")
+position = Vector2(-140, -900)
+size = Vector2(1260, 900)
+style = 3
+color = Color(0.45, 0.45, 0.52, 1)
+
+[node name="HallBackdrop" type="Node2D" parent="."]
+script = ExtResource("7")
+position = Vector2(1100, -300)
+size = Vector2(850, 130)
+style = 3
+color = Color(0.75, 0.75, 0.8, 1)
+
+[node name="DomeBackdrop" type="Node2D" parent="."]
+script = ExtResource("7")
+position = Vector2(1950, -420)
+size = Vector2(450, 250)
+style = 4
+color = Color(0.85, 0.7, 0.55, 1)
+
+[node name="HutBackdrop" type="Node2D" parent="."]
+script = ExtResource("7")
+position = Vector2(2050, -230)
+size = Vector2(80, 60)
+style = 5
+color = Color(0.9, 0.8, 0.7, 1)
+
+[node name="CityBackdrop" type="Node2D" parent="."]
+script = ExtResource("7")
+position = Vector2(2400, -700)
+size = Vector2(2060, 700)
+style = 2
+color = Color(0.4, 0.4, 0.46, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="Yard" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(-140, 0)
+size = Vector2(1240, 64)
+style = 3
+
+[node name="YardWallL" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(-140, -500)
+size = Vector2(40, 500)
+style = 3
+
+[node name="RoofA" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(-100, -160)
+size = Vector2(350, 20)
+style = 1
+
+[node name="RoofB" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(400, -170)
+size = Vector2(220, 20)
+style = 1
+
+[node name="Balcony" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(820, -170)
+size = Vector2(280, 20)
+style = 3
+
+[node name="HallFloor" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1100, -170)
+size = Vector2(1300, 30)
+style = 3
+
+[node name="HallCeiling" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1100, -310)
+size = Vector2(850, 12)
+style = 3
+
+[node name="DomeCeiling" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1950, -430)
+size = Vector2(450, 12)
+style = 3
+
+[node name="HallWallBase" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(1100, -150)
+size = Vector2(1300, 230)
+style = 3
+
+[node name="C1" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2400, -170)
+size = Vector2(500, 250)
+style = 1
+
+[node name="C2" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2940, -170)
+size = Vector2(560, 250)
+style = 1
+
+[node name="C3" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(3540, -170)
+size = Vector2(460, 250)
+style = 1
+
+[node name="C4" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(4040, -170)
+size = Vector2(380, 250)
+style = 1
+
+[node name="EndWall" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(4420, -700)
+size = Vector2(40, 780)
+style = 3
+
+[node name="ExitGate" type="StaticBody2D" parent="Geometry"]
+script = ExtResource("1")
+position = Vector2(2392, -300)
+size = Vector2(8, 130)
+style = 6
+ash = false
+
+[node name="Interior" type="Node2D" parent="."]
+script = ExtResource("18")
+position = Vector2(1100, -430)
+size = Vector2(1300, 260)
+
+[node name="Soothing" type="Node2D" parent="."]
+script = ExtResource("23")
+position = Vector2(1100, -310)
+size = Vector2(1300, 140)
+
+[node name="Street" type="Area2D" parent="."]
+script = ExtResource("8")
+position = Vector2(2400, 20)
+size = Vector2(2020, 60)
+
+[node name="Metal" type="Node2D" parent="."]
+
+[node name="BracketB" type="Node2D" parent="Metal"]
+script = ExtResource("12")
+position = Vector2(392, -200)
+style = 1
+
+[node name="BracketC" type="Node2D" parent="Metal"]
+script = ExtResource("12")
+position = Vector2(812, -200)
+style = 1
+
+[node name="Lamp1" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(300, -60)
+metal = false
+
+[node name="Lamp2" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(700, -60)
+metal = false
+
+[node name="Lamp3" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(1000, -60)
+metal = false
+
+[node name="HallLamp1" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(1400, -260)
+metal = false
+
+[node name="HallLamp2" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(1800, -260)
+metal = false
+
+[node name="DomeLamp" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(2200, -330)
+metal = false
+radius = 160.0
+
+[node name="ChaseLamp1" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(2700, -230)
+metal = false
+
+[node name="ChaseLamp2" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(3300, -230)
+metal = false
+
+[node name="ChaseLamp3" type="Node2D" parent="."]
+script = ExtResource("6")
+position = Vector2(4100, -230)
+metal = false
+
+[node name="YardGuard1" type="CharacterBody2D" parent="."]
+script = ExtResource("19")
+position = Vector2(300, -1)
+patrol_distance = 80.0
+carries_lantern = true
+
+[node name="YardGuard2" type="CharacterBody2D" parent="."]
+script = ExtResource("19")
+position = Vector2(700, -1)
+patrol_distance = 100.0
+
+[node name="Seeker" type="CharacterBody2D" parent="."]
+script = ExtResource("20")
+position = Vector2(1000, -1)
+patrol_distance = 30.0
+
+[node name="Bell" type="Node2D" parent="."]
+script = ExtResource("21")
+position = Vector2(880, -60)
+reinforcements = Array[Vector2]([Vector2(560, -1), Vector2(600, -1)])
+
+[node name="Arena1" type="Node2D" parent="."]
+script = ExtResource("22")
+position = Vector2(1250, -170)
+size = Vector2(300, 120)
+
+[node name="Guard0" type="CharacterBody2D" parent="Arena1"]
+script = ExtResource("19")
+position = Vector2(160, -1)
+patrol_distance = 30.0
+
+[node name="Guard1" type="CharacterBody2D" parent="Arena1"]
+script = ExtResource("19")
+position = Vector2(240, -1)
+patrol_distance = 30.0
+
+[node name="Arena2" type="Node2D" parent="."]
+script = ExtResource("22")
+position = Vector2(1600, -170)
+size = Vector2(330, 120)
+
+[node name="Guard0" type="CharacterBody2D" parent="Arena2"]
+script = ExtResource("19")
+position = Vector2(150, -1)
+patrol_distance = 30.0
+armoured = true
+
+[node name="Guard1" type="CharacterBody2D" parent="Arena2"]
+script = ExtResource("19")
+position = Vector2(220, -1)
+patrol_distance = 30.0
+armoured = true
+
+[node name="Guard2" type="CharacterBody2D" parent="Arena2"]
+script = ExtResource("19")
+position = Vector2(290, -1)
+patrol_distance = 30.0
+armoured = false
+
+[node name="Bendal" type="CharacterBody2D" parent="."]
+script = ExtResource("24")
+position = Vector2(2270, -171)
+
+[node name="Logbook" type="Area2D" parent="."]
+script = ExtResource("25")
+position = Vector2(2350, -182)
+
+[node name="ChaseRoute" type="Line2D" parent="."]
+points = PackedVector2Array(2300, -171, 2890, -171, 2920, -230, 2950, -171, 3490, -171, 3520, -230, 3550, -171, 3990, -171, 4020, -230, 4050, -171, 4300, -171)
+width = 1.0
+default_color = Color(1, 0, 0, 0)
+
+[node name="CopperPrompt" type="Node" parent="."]
+script = ExtResource("14")
+prompt_id = "m09_copper"
+action = "toggle_copper"
+text = "Burn copper to hide your Allomancy from Seekers"
+
+[node name="AtiumPrompt" type="Node" parent="."]
+script = ExtResource("14")
+prompt_id = "m09_atium"
+action = "atium"
+text = "Hold Tab to burn atium"
+
+[node name="InsideTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(1130, -170)
+dialogue_file = "res://data/dialogue/m09.json"
+dialogue_node = "inside"
+once_flag = "m09_inside"
+
+[node name="SoothingTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(1200, -170)
+dialogue_file = "res://data/dialogue/m09.json"
+dialogue_node = "soothing"
+once_flag = "m09_soothing"
+
+[node name="HutTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(2000, -170)
+dialogue_file = "res://data/dialogue/m09.json"
+dialogue_node = "hut"
+once_flag = "m09_hut"
+
+[node name="BendalTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(2150, -170)
+dialogue_file = "res://data/dialogue/m09.json"
+dialogue_node = "bendal"
+once_flag = "m09_bendal"
+prompt_path = NodePath("../AtiumPrompt")
+
+[node name="CollapseTrigger" type="Area2D" parent="."]
+script = ExtResource("13")
+position = Vector2(4250, -170)
+dialogue_file = "res://data/dialogue/m09.json"
+dialogue_node = "collapse"
+once_flag = "m09_collapse"
+
+[node name="Checkpoint0" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(0, -160)
+
+[node name="Checkpoint1" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(1060, -170)
+
+[node name="Checkpoint2" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(1580, -170)
+
+[node name="Checkpoint3" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(1980, -170)
+
+[node name="Checkpoint4" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(2960, -170)
+
+[node name="Checkpoint5" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(3560, -170)
+
+[node name="Checkpoint6" type="Area2D" parent="."]
+script = ExtResource("9")
+position = Vector2(4060, -170)
+
+[node name="Clip0" type="RigidBody2D" parent="."]
+script = ExtResource("26")
+position = Vector2(2600, -173)
+
+[node name="Clip1" type="RigidBody2D" parent="."]
+script = ExtResource("26")
+position = Vector2(3200, -173)
+
+[node name="Clip2" type="RigidBody2D" parent="."]
+script = ExtResource("26")
+position = Vector2(3800, -173)
+
+[node name="KelsierScript" type="Node2D" parent="."]
+
+[node name="01_Balcony" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(1080, -171)
+action = 1
+move = 0
+trigger_radius = 60.0
+
+[node name="02_Companion" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(2000, -171)
+action = 2
+move = 0
+trigger_radius = 50.0
+
+[node name="03_ToHut" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(2090, -171)
+action = 0
+move = 0
+trigger_radius = 120.0
+
+[node name="04_AtHut" type="Node2D" parent="KelsierScript"]
+script = ExtResource("16")
+position = Vector2(2090, -171)
+action = 1
+move = 0
+trigger_radius = 30.0
+
+[node name="Kelsier" type="Node2D" parent="."]
+script = ExtResource("15")
+position = Vector2(1080, -171)
+mode = 1
+markers_path = NodePath("../KelsierScript")
+
+[node name="Night" type="Node2D" parent="."]
+script = ExtResource("5")
+
+[node name="Vin" parent="." instance=ExtResource("2")]
+position = Vector2(0, -161)
+
+[node name="Camera" type="Camera2D" parent="."]
+script = ExtResource("3")
+process_callback = 0
+target_path = NodePath("../Vin")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+script = ExtResource("4")
+
+[node name="ScreenFx" type="CanvasLayer" parent="."]
+script = ExtResource("10")
+
+[node name="TuningPanel" type="CanvasLayer" parent="."]
+script = ExtResource("11")

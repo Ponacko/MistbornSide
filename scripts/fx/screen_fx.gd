@@ -42,6 +42,11 @@ func _draw_fx() -> void:
 		_vignette(size, Color(0.25, 0.02, 0.02), strength)
 	if _hurt > 0.0:
 		_vignette(size, Color(0.6, 0.05, 0.05), _hurt * 0.4)
+	if _vin.wounded:
+		# Each blow during the chase darkens the edges further.
+		_vignette(size, Color(0.0, 0.0, 0.0), minf(0.5 + 0.25 * _vin.wound_hits, 1.6))
+	if _vin.soothed:
+		_canvas.draw_rect(Rect2(Vector2.ZERO, size), Color(0.45, 0.47, 0.55, 0.18))
 	if _vin.senses.whiteout > 0.0:
 		var a := _vin.senses.whiteout * Settings.flash_intensity
 		_canvas.draw_rect(Rect2(Vector2.ZERO, size), Color(1, 1, 0.96, a))
