@@ -91,6 +91,17 @@ func think(delta: float) -> void:
 	_place_spear()
 
 
+func winding_up() -> bool:
+	return _windup > 0.0
+
+
+func _will_strike(seconds: float) -> bool:
+	var v := vin()
+	if v == null or not aware:
+		return false
+	return absf(v.global_position.x - global_position.x) <= Game.tuning.guard_reach + chase_speed * seconds and _cooldown < seconds
+
+
 func _strike(v: Vin, t: Tuning) -> void:
 	_cooldown = t.guard_cooldown
 	NoiseBus.emit(global_position, 0.6, NoiseBus.Kind.FIGHT)

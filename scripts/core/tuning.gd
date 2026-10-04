@@ -151,6 +151,16 @@ func jump_speed() -> float:
 @export var bendal_recover := 0.9
 @export var bendal_coin_return_range := 70.0
 
+@export_group("Atium")
+## Hold Tab this long to burn a bead (prevents waste).
+@export var atium_confirm_time := 0.35
+## Real seconds a bead burns.
+@export var atium_duration := 8.0
+## How far ahead enemy shadows show, in seconds.
+@export var atium_lookahead := 1.2
+@export var atium_time_scale := 0.9
+@export var atium_dodge_scale := 2.5
+
 @export_group("Stealth")
 ## Suspicion per second when Vin is in plain sight, close up.
 @export var see_rate := 1.3

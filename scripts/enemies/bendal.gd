@@ -178,6 +178,38 @@ func recovering() -> bool:
 	return phase == Phase.RECOVERING
 
 
+## Atium's view of Bendal: runs his attack timeline forward, so the shadow
+## shows each axe stroke coming and the recovery gap after them.
+func forecast(seconds: float) -> Dictionary:
+	var t := Game.tuning
+	var p := phase
+	var timer := _timer
+	var swings := _swings_left
+	var left := seconds
+	var struck_in_window := false
+	while left > 0.0 and (p == Phase.ATTACKING or p == Phase.RECOVERING):
+		if timer > left:
+			timer -= left
+			left = 0.0
+			break
+		left -= timer
+		if p == Phase.ATTACKING:
+			struck_in_window = true
+			swings -= 1
+			if swings > 0:
+				timer = t.bendal_second_swing
+			else:
+				p = Phase.RECOVERING
+				timer = t.bendal_recover
+		else:
+			p = Phase.PURSUING
+			timer = 0.0
+	var pos := global_position
+	if p == Phase.PURSUING:
+		pos.x += facing * t.bendal_speed * left
+	return {"node": self, "pos": pos, "attacking": p == Phase.ATTACKING or struck_in_window, "safe": p == Phase.RECOVERING}
+
+
 ## Coins Vin throws at him come back at her.
 func _return_coins(v: Vin, t: Tuning) -> void:
 	if v == null:

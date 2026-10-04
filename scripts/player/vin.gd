@@ -48,6 +48,7 @@ var invulnerable := false
 var atium_beads := 0
 var _input_locks: Array[Object] = []
 var combat: VinCombat
+var atium: AtiumBurn
 ## Atium widens the dodge window and makes counters auto-aim.
 var dodge_window_scale := 1.0
 var counter_aim := false
@@ -108,6 +109,8 @@ func _ready() -> void:
 	add_child(senses)
 	combat = VinCombat.new(self)
 	add_child(combat)
+	atium = AtiumBurn.new(self)
+	add_child(atium)
 	# The mists are faintly luminescent: Vin is never a black hole in the night.
 	var glow := PointLight2D.new()
 	glow.name = "MistGlow"
@@ -177,6 +180,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_iframes = maxf(_iframes - delta, 0.0)
 	_burn_toggles(delta, t)
+	atium.physics_update(delta)
 	senses.physics_update(delta)
 	if state != State.STAGGER:
 		pouch.physics_update(delta)
@@ -266,6 +270,7 @@ func respawn_at(at: Vector2) -> void:
 	crouching = false
 	_apply_shape()
 	allomancy.steelsight.cancel()
+	atium.stop()
 	health.reset()
 	reset_physics_interpolation()
 	cloak.reset(global_position + SHOULDERS)

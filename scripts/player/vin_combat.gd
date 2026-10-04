@@ -91,6 +91,8 @@ func _heavy(t: Tuning) -> void:
 ## A dagger on an unaware enemy from behind is a backstab.
 func _strike(kind: Hit.Kind, damage: float, reach: float, light: bool) -> bool:
 	NoiseBus.emit(vin.global_position, 0.5, NoiseBus.Kind.FIGHT)
+	if vin.counter_aim:
+		_aim_counter(reach)
 	var any := false
 	for node in vin.get_tree().get_nodes_in_group("hittable"):
 		var target := node as Node2D
@@ -103,11 +105,23 @@ func _strike(kind: Hit.Kind, damage: float, reach: float, light: bool) -> bool:
 			var e := target as Enemy
 			if e.is_unaware() and e.facing == vin.facing:
 				hit = Hit.make(Hit.Kind.BACKSTAB, 1000.0, Vector2(vin.facing, 0), vin, false)
-		if vin.counter_aim and target is Enemy:
-			vin.facing = 1 if target.global_position.x > vin.global_position.x else -1
 		target.take_hit(hit)
 		any = true
 	return any
+
+
+## Atium counters: turn to the nearest enemy in reach on either side.
+func _aim_counter(reach: float) -> void:
+	var best: Node2D = null
+	var best_d := reach + 10.0
+	for node in vin.get_tree().get_nodes_in_group("hittable"):
+		var n := node as Node2D
+		var d := absf(n.global_position.x - vin.global_position.x)
+		if d < best_d and absf(n.global_position.y - vin.global_position.y) < 30.0:
+			best_d = d
+			best = n
+	if best:
+		vin.facing = 1 if best.global_position.x >= vin.global_position.x else -1
 
 
 func _update_plunge(t: Tuning) -> void:

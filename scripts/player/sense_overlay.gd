@@ -37,3 +37,17 @@ func _draw() -> void:
 		draw_arc(at, r + 4.0, 0.0, TAU, 16, Color(c, 0.35), 1.0, true)
 		if b.labelled:
 			draw_string(ThemeDB.fallback_font, at + Vector2(-16, -12), b.label, HORIZONTAL_ALIGNMENT_CENTER, 32, 8, c)
+
+	# Atium: translucent shadows of what enemies are about to do.
+	for sh in vin.atium.shadows():
+		var at: Vector2 = sh.pos
+		var c := Color(0.85, 0.9, 1.0, 0.35)
+		if sh.attacking:
+			c = Color(1.0, 0.55, 0.5, 0.45)
+		elif sh.safe:
+			c = Color(0.6, 1.0, 0.7, 0.4)
+		draw_rect(Rect2(at + Vector2(-7, -44), Vector2(14, 44)), c)
+		if sh.attacking:
+			draw_line(at + Vector2(0, -30), at + Vector2(sh.node.facing * 26.0, -40), c, 2.0)
+	for path in vin.atium.projectile_paths():
+		draw_line(path[0], path[1], Color(1.0, 0.85, 0.6, 0.5), 1.0, true)

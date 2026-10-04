@@ -72,6 +72,10 @@ func think(delta: float) -> void:
 		_patrol()
 
 
+func winding_up() -> bool:
+	return _windup > 0.0
+
+
 func _strike(v: Vin, t: Tuning) -> void:
 	_cooldown = t.hazekiller_cooldown
 	_attacking = false

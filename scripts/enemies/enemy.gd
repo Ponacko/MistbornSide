@@ -244,6 +244,24 @@ func on_death() -> void:
 	pass
 
 
+## What atium shows of this enemy `seconds` from now: {node, pos, attacking,
+## safe}. Default: he keeps walking as he is, and strikes if he is winding up
+## or will be in reach.
+func forecast(seconds: float) -> Dictionary:
+	var pos := global_position + Vector2(velocity.x * seconds, 0)
+	if not is_on_floor():
+		pos.y += velocity.y * seconds
+	return {"node": self, "pos": pos, "attacking": winding_up() or _will_strike(seconds), "safe": false}
+
+
+func winding_up() -> bool:
+	return false
+
+
+func _will_strike(_seconds: float) -> bool:
+	return false
+
+
 ## The suspicion icon over the head: ? suspicious, ! alerted.
 func _draw_suspicion() -> void:
 	if _dead:
