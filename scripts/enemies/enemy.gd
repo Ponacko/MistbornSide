@@ -20,8 +20,21 @@ const HALF_WIDTH := 7.0
 const HEIGHT := 44.0
 
 var health: Health
-## Knows Vin is here (the alerted stage of suspicion).
-var aware := false
+var suspicion := Suspicion.new()
+## Knows Vin is here: the alerted stage of suspicion.
+var aware: bool:
+	get:
+		return suspicion.stage == Suspicion.Stage.ALERTED
+	set(value):
+		if value:
+			suspicion.alert()
+		else:
+			suspicion.level = 0.0
+			suspicion.calm(0.0)
+## Senses Vin's burning through walls (Seekers, Inquisitors).
+var seeker := false
+## Shown to bronze as a beacon with this Misting name; empty for none.
+var misting_label := ""
 var desired_speed := 0.0
 var last_hit_kind := -1
 var home := Vector2.ZERO
@@ -45,6 +58,10 @@ func _ready() -> void:
 	home = global_position
 	add_to_group("enemies")
 	add_to_group("hittable")
+	if misting_label != "":
+		add_to_group("allomancers")
+	suspicion.stage_changed.connect(_on_stage_changed)
+	NoiseBus.noise.connect(_on_noise)
 
 
 func dead() -> bool:
@@ -65,13 +82,62 @@ func is_unaware() -> bool:
 
 func notice() -> void:
 	if not aware and not _dead:
-		aware = true
+		var v := vin()
+		suspicion.alert(v.global_position if v else Vector2.INF)
+
+
+func _on_stage_changed(stage: Suspicion.Stage) -> void:
+	if stage == Suspicion.Stage.ALERTED:
 		noticed.emit()
+
+
+func _on_noise(pos: Vector2, loudness: float, _kind: NoiseBus.Kind) -> void:
+	if _dead:
+		return
+	var reach := loudness * Game.tuning.hearing_range
+	var d := pos.distance_to(global_position)
+	if d < reach and d > 1.0:
+		suspicion.hear(loudness * (1.0 - d / reach), pos)
+
+
+## How plainly this enemy sees Vin right now, 0..1. Lantern light exposes
+## her; in shadow the mists hide her beyond arm's reach; guards do not look
+## up at rooftops unless alerted.
+func sight_of_vin() -> float:
+	var v := vin()
+	if v == null or v.is_dead():
+		return 0.0
+	var t := Game.tuning
+	var d := v.chest_position() - chest_position()
+	var dist := d.length()
+	var alerted := aware
+	if d.x * facing < -8.0 and not alerted:
+		return 0.0
+	if not alerted and rad_to_deg(atan2(-d.y, absf(d.x))) > t.look_up_degrees:
+		return 0.0
+	var range := t.sight_range_lit if Stealth.is_lit(v.chest_position()) else t.sight_range_dark
+	if dist > range:
+		return 0.0
+	var q := PhysicsRayQueryParameters2D.create(chest_position(), v.chest_position(), Layers.WORLD)
+	if not get_world_2d().direct_space_state.intersect_ray(q).is_empty():
+		return 0.0
+	return 1.0 - dist / range * 0.6
+
+
+## Seekers feel any metal Vin burns within their radius unless copper is on.
+func seeker_sense() -> float:
+	var v := vin()
+	if not seeker or v == null or not v.detectable_burning():
+		return 0.0
+	return Game.tuning.seeker_rate if v.global_position.distance_to(global_position) < Game.tuning.seeker_radius else 0.0
 
 
 func _physics_process(delta: float) -> void:
 	var t := Game.tuning
 	if not _dead:
+		var v := vin()
+		var seen := maxf(sight_of_vin(), seeker_sense())
+		suspicion.update(delta, seen, t, v.global_position if v and seen > 0.0 else Vector2.INF)
 		_stagger = maxf(_stagger - delta, 0.0)
 		if _stagger <= 0.0:
 			think(delta)
@@ -93,6 +159,16 @@ func _physics_process(delta: float) -> void:
 ## Behaviour hook: set desired_speed, attack, turn.
 func think(_delta: float) -> void:
 	_patrol()
+
+
+## Suspicious: stop and look toward the last sight or sound, edging closer.
+func _investigate() -> void:
+	var at := suspicion.last_stimulus
+	if at == Vector2.INF:
+		desired_speed = 0.0
+		return
+	face_toward(at.x)
+	desired_speed = facing * walk_speed * 0.6 if absf(at.x - global_position.x) > 24.0 and _floor_ahead() else 0.0
 
 
 func _patrol() -> void:
@@ -166,3 +242,20 @@ func die() -> void:
 
 func on_death() -> void:
 	pass
+
+
+## The suspicion icon over the head: ? suspicious, ! alerted.
+func _draw_suspicion() -> void:
+	if _dead:
+		return
+	var top := Vector2(0, -HEIGHT - 6)
+	match suspicion.stage:
+		Suspicion.Stage.SUSPICIOUS:
+			var c := Settings.palette_color(&"suspicious")
+			draw_arc(top + Vector2(0, -6), 2.5, PI, TAU + PI * 0.5, 6, c, 1.0)
+			draw_rect(Rect2(top + Vector2(-0.5, -4), Vector2(1, 2)), c)
+			draw_rect(Rect2(top + Vector2(-0.5, -1), Vector2(1, 1)), c)
+		Suspicion.Stage.ALERTED:
+			var c := Settings.palette_color(&"alerted")
+			draw_rect(Rect2(top + Vector2(-1, -9), Vector2(2, 6)), c)
+			draw_rect(Rect2(top + Vector2(-1, -1), Vector2(2, 2)), c)

@@ -132,6 +132,27 @@ func jump_speed() -> float:
 ## Landing faster than this kills a guard (a fall from a roof).
 @export var fall_death_speed := 520.0
 
+@export_group("Stealth")
+## Suspicion per second when Vin is in plain sight, close up.
+@export var see_rate := 1.3
+@export var suspicious_threshold := 0.35
+@export var suspicion_decay := 0.15
+## Seconds an alerted enemy keeps hunting after losing Vin.
+@export var alert_memory := 6.0
+@export var sight_range_lit := 280.0
+@export var sight_range_dark := 40.0
+## Guards do not look up past this angle unless alerted (rooftop advantage).
+@export var look_up_degrees := 35.0
+## Pixels a noise of loudness 1 carries.
+@export var hearing_range := 300.0
+@export var seeker_radius := 220.0
+@export var seeker_rate := 0.9
+@export var bronze_range := 450.0
+@export var bronze_listen_time := 1.0
+@export var bell_delay := 2.5
+## Fall speed above which Vin's landing makes a noise.
+@export var loud_landing_speed := 380.0
+
 @export_group("Coins")
 @export var coin_pouch_size := 30
 @export var coin_flick_speed := 220.0

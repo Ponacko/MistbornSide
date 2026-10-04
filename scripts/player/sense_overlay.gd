@@ -27,3 +27,13 @@ func _draw() -> void:
 				var c := Color(0.85, 0.95, 1.0, a)
 				draw_line(p + Vector2(-3, 0), p + Vector2(3, 0), c, 1.0)
 				draw_line(p + Vector2(0, -3), p + Vector2(0, 3), c, 1.0)
+
+	for b in vin.senses.bronze_beacons():
+		var n: Node2D = b.node
+		var at: Vector2 = n.global_position + Vector2(0, -24)
+		var r := 5.0 + 3.0 * (0.5 + 0.5 * sin(_time * 5.0))
+		var c := Color(0.85, 0.6, 0.3, 0.8)
+		draw_arc(at, r, 0.0, TAU, 16, c, 1.0, true)
+		draw_arc(at, r + 4.0, 0.0, TAU, 16, Color(c, 0.35), 1.0, true)
+		if b.labelled:
+			draw_string(ThemeDB.fallback_font, at + Vector2(-16, -12), b.label, HORIZONTAL_ALIGNMENT_CENTER, 32, 8, c)

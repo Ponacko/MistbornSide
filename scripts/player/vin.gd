@@ -130,6 +130,7 @@ func _ready() -> void:
 	layer.add_child(overlay)
 	add_child(layer)
 	health.died.connect(_on_died)
+	landed.connect(_on_landed)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -250,6 +251,16 @@ func respawn_at(at: Vector2) -> void:
 	cloak.reset(global_position + SHOULDERS)
 
 
+## Landing hard makes noise; pewter softens it.
+func _on_landed(fall_speed: float) -> void:
+	var t := Game.tuning
+	if fall_speed > t.loud_landing_speed:
+		var loud := clampf((fall_speed - t.loud_landing_speed) / 200.0, 0.25, 1.0)
+		if pewter_on:
+			loud *= 0.5
+		NoiseBus.emit(global_position, loud, NoiseBus.Kind.LANDING)
+
+
 func _on_died() -> void:
 	_death_timer = Game.tuning.death_respawn_delay
 	_enter_stagger(_death_timer)
@@ -263,6 +274,15 @@ func is_dead() -> bool:
 ## Test and cutscene helper: pewter on or off without the toggle key.
 func toggle_pewter_now(on: bool) -> void:
 	pewter_on = on and reserves.has(MetalReserves.Metal.PEWTER)
+
+
+func toggle_tin_now(on: bool) -> void:
+	tin_on = on and reserves.has(MetalReserves.Metal.TIN)
+
+
+## Burning that a Seeker can feel: anything but copper, unless copper hides it.
+func detectable_burning() -> bool:
+	return not copper_on and (allomancy.force_active or pewter_on or tin_on or bronze_on)
 
 
 ## A roll along the ground: the dodge (with invulnerability frames) or the

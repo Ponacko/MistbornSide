@@ -5,6 +5,9 @@ extends Enemy
 ## breastplate shoves his whole body; a hard Pull on his spear tears it away.
 
 @export var armoured := true
+## Carries a lantern: lights Vin up near him and swings it at her when
+## suspicious, blinding a tin-burner.
+@export var carries_lantern := false
 
 var breastplate: MetalSource
 var spear: MetalSource
@@ -12,6 +15,8 @@ var has_spear := true
 var _windup := 0.0
 var _cooldown := 0.0
 var _grip_strain := 0.0
+var lantern: Lantern
+var _flash_cooldown := 0.0
 
 
 func _ready() -> void:
@@ -22,6 +27,11 @@ func _ready() -> void:
 		breastplate.mass = 8.0
 		breastplate.position = Vector2(0, -30)
 		add_child(breastplate)
+	if carries_lantern:
+		lantern = Lantern.new()
+		lantern.radius = 80.0
+		lantern.metal = true
+		add_child(lantern)
 	spear = MetalSource.new()
 	spear.kind = MetalSource.Kind.CARRIED
 	spear.mass = 2.0
@@ -44,7 +54,15 @@ func think(delta: float) -> void:
 	var t := Game.tuning
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	_grip_strain = maxf(_grip_strain - t.guard_grip * delta, 0.0)
+	_flash_cooldown = maxf(_flash_cooldown - delta, 0.0)
 	var v := vin()
+	if lantern:
+		lantern.position = Vector2(-facing * 8.0, -22.0)
+		if v and suspicion.stage != Suspicion.Stage.IDLE and _flash_cooldown <= 0.0:
+			var dx := (v.global_position.x - global_position.x) * facing
+			if dx > -4.0 and dx < 100.0 and absf(v.global_position.y - global_position.y) < 40.0:
+				_flash_cooldown = 4.0
+				lantern.flash()
 	var alive := v != null and not v.health.is_dead()
 	if alive and not aware and v.global_position.distance_to(global_position) < t.guard_contact_distance:
 		notice()
@@ -53,6 +71,8 @@ func think(delta: float) -> void:
 		_windup -= delta
 		if _windup <= 0.0:
 			_strike(v, t)
+	elif aware and alive and suspicion.last_stimulus != Vector2.INF and v.global_position.distance_to(global_position) > 340.0:
+		_investigate()
 	elif aware and alive:
 		face_toward(v.global_position.x)
 		var dx := v.global_position.x - global_position.x
@@ -64,6 +84,8 @@ func think(delta: float) -> void:
 			desired_speed = signf(dx) * chase_speed
 		else:
 			desired_speed = 0.0
+	elif suspicion.stage == Suspicion.Stage.SUSPICIOUS:
+		_investigate()
 	else:
 		_patrol()
 	_place_spear()
@@ -135,6 +157,4 @@ func _draw() -> void:
 		var tip := Vector2(facing * (24.0 if _windup <= 0.0 else 14.0), -26)
 		draw_line(Vector2(-facing * 10.0, -24), tip, Color(0.45, 0.33, 0.22), 2.0)
 		draw_line(tip, tip + Vector2(facing * 4.0, 0), Color(0.7, 0.72, 0.76), 2.0)
-	if aware:
-		draw_rect(Rect2(-1, -HEIGHT - 12, 2, 6), Color(0.95, 0.4, 0.3))
-		draw_rect(Rect2(-1, -HEIGHT - 4, 2, 2), Color(0.95, 0.4, 0.3))
+	_draw_suspicion()
